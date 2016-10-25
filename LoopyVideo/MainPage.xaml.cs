@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.UI.Composition;
+using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -27,56 +30,166 @@ namespace LoopyVideo
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        MediaPlayer _mediaPlayer;
+        private string mediaFile = "/Assets/Test2.mp4";
+
+        private Uri _mediaBaseUri;
+
+        private MediaSource _media;
+        public MediaSource Source
+        {
+            get { return _media; }
+            private set { _media = value; }
+        }
+
+
+        private async Task<StorageFolder> GetBaseFolderAsync()
+        {
+            StorageLibrary lib = await StorageLibrary.GetLibraryAsync(KnownLibraryId.Videos);
+            StorageFolder folder = lib.SaveFolder;
+            Debug.WriteLine(string.Format("The video library path is: {0}", folder.Path));
+            return folder;
+        } 
+
+
+        private async Task<MediaSource> GetCurrentMediaSourceAsync()
+        {
+            StorageFolder folder = await GetBaseFolderAsync();
+            // Get the files in the SaveFolder folder.
+            IReadOnlyList<StorageFile> filesList = await folder.GetFilesAsync();
+            if(filesList.Count == 0)
+            {
+                throw new FileNotFoundException("There are no files in the video library");
+            }
+            Debug.WriteLine(string.Format("The video file is: {0}", filesList.First().Path));
+            return MediaSource.CreateFromStorageFile(filesList.First());
+        }
+
+        
 
         public MainPage()
         {
             this.InitializeComponent();
-            _mediaPlayer = new MediaPlayer();
+            _mediaBaseUri = BaseUri;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             try
             {
-                _mediaPlayer.Source = MediaSource.CreateFromUri(new Uri("ms-appx:///Assets/COUNTDOWN_512kb.mp4"));
-                _mediaPlayer.AudioCategory = MediaPlayerAudioCategory.Media;
-                _mediaPlayer.IsLoopingEnabled = true;
-                _mediaPlayer.IsMuted = true;
 
+                //_playerElement.IsFullWindow = true;
 
-                _mediaPlayer.SetSurfaceSize(new Size(_playerSurface.ActualWidth, _playerSurface.ActualHeight));
+                MediaPlayer player = _playerElement.MediaPlayer;
+                player.Source = await GetCurrentMediaSourceAsync();
+                player.RealTimePlayback = true;
+                player.PlaybackSession.PlaybackRate = 1.0;
+                player.AutoPlay = true;
+                player.MediaEnded += Player_MediaEnded;
+                player.MediaFailed += Player_MediaFailed;
+                player.MediaOpened += Player_MediaOpened;
+                player.SourceChanged += Player_SourceChanged;
+                player.PlaybackSession.BufferingEnded += Player_BufferingEnded;
+                player.PlaybackSession.BufferingProgressChanged += Player_BufferingProgressChanged;
+                player.PlaybackSession.BufferingStarted += Player_BufferingStarted;
+                player.PlaybackSession.DownloadProgressChanged += Player_DownloadProgressChanged;
+                player.PlaybackSession.NaturalDurationChanged += Player_NaturalDurationChanged;
+                player.PlaybackSession.NaturalVideoSizeChanged += Player_NaturalVideoSizeChanged;
+                player.PlaybackSession.PlaybackRateChanged += Player_PlaybackRateChanged;
+                player.PlaybackSession.PlaybackStateChanged += Player_PlaybackStateChanged;
+                player.PlaybackSession.PositionChanged += Player_PositionChanged;
+                player.PlaybackSession.SeekCompleted += Player_SeekCompleted;
 
-                var compositor = Windows.UI.Xaml.Hosting.ElementCompositionPreview.GetElementVisual(this).Compositor;
-                MediaPlayerSurface surface = _mediaPlayer.GetSurface(compositor);
-
-                SpriteVisual spriteVisual = compositor.CreateSpriteVisual();
-                spriteVisual.Size =
-                    new System.Numerics.Vector2((float)_playerSurface.ActualWidth, (float)_playerSurface.ActualHeight);
-
-                CompositionBrush brush = compositor.CreateSurfaceBrush(surface.CompositionSurface);
-                spriteVisual.Brush = brush;
-
-                ContainerVisual container = compositor.CreateContainerVisual();
-                container.Children.InsertAtTop(spriteVisual);
-
-                ElementCompositionPreview.SetElementChildVisual(_playerSurface, container);
-
-                _mediaPlayer.Play();
 
             }
             catch(Exception ex)
             {
-                MessageDialog errorDialog = new MessageDialog(ex.Message, "Error Creating MediaPlayer");
-                await errorDialog.ShowAsync();
+                MessageDialog dialog = new MessageDialog(ex.Message);
+                await dialog.ShowAsync();
             }
 
+        }
 
+        private TimeSpan updateTime = new TimeSpan();
+        private void Player_PositionChanged(MediaPlaybackSession sender, object args)
+        {
+            if(sender.Position > updateTime)
+            {
+                Debug.WriteLine("PlayBack Session Position Changed to: " + sender.Position.ToString());
+                updateTime += TimeSpan.FromSeconds(1.0);
+            }
+        }
+
+        private void Player_PlaybackStateChanged(MediaPlaybackSession sender, object args)
+        {
+            Debug.WriteLine("PlayBack Session State Changed to: " + sender.PlaybackState.ToString());
+        }
+
+        private void Player_NaturalVideoSizeChanged(MediaPlaybackSession sender, object args)
+        {
+            Size size = new Windows.Foundation.Size(sender.NaturalVideoWidth, sender.NaturalVideoHeight);
+            Debug.WriteLine("Natural Video Size Changed to: " + size.ToString());
+        }
+
+        private void Player_DownloadProgressChanged(MediaPlaybackSession sender, object args)
+        {
+            Debug.WriteLine("Current DownloadProgress: " + sender.DownloadProgress.ToString());
+        }
+
+        private void Player_BufferingProgressChanged(MediaPlaybackSession sender, object args)
+        {
+            Debug.WriteLine("Buffer Progress is currently: " + sender.BufferingProgress.ToString());
+
+        }
+
+        private void Player_SourceChanged(MediaPlayer sender, object args)
+        {
+            Debug.WriteLine("Player Source changed");
+        }
+
+        private void Player_PlaybackRateChanged(MediaPlaybackSession sender, object args)
+        {
+            Debug.WriteLine("Playback Rate is currently :" + sender.PlaybackRate.ToString());
+        }
+
+        private void Player_NaturalDurationChanged(MediaPlaybackSession sender, object args)
+        {
+            Debug.WriteLine("Natural Video Duration is :" + sender.NaturalDuration.ToString());
+        }
+
+        private void Player_MediaOpened(MediaPlayer sender, object args)
+        {
+            Debug.WriteLine("The Player opened :" + sender.Source.ToString());
+        }
+
+        private void Player_MediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
+        {
+            Debug.WriteLine("The media source has failed : " + args.ErrorMessage);
+
+        }
+
+        private void Player_BufferingStarted(MediaPlaybackSession sender, object args)
+        {
+            Debug.WriteLine("Buffer has started");
+        }
+
+        private void Player_BufferingEnded(MediaPlaybackSession sender, object args)
+        {
+            Debug.WriteLine("Buffer has started");
+        }
+
+        private void Player_SeekCompleted(MediaPlaybackSession sender, object args)
+        {
+            sender.MediaPlayer.Play();
+        }
+
+        private void Player_MediaEnded(MediaPlayer sender, object args)
+        {
+            sender.PlaybackSession.Position = TimeSpan.Zero;
+            updateTime = TimeSpan.Zero;
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            _mediaPlayer.Dispose();
         }
 
     }
