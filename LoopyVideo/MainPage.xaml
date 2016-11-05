@@ -8,19 +8,17 @@
     xmlns:mediacore="using:Windows.Media.Core"
     mc:Ignorable="d"
     Loaded="Page_Loaded"
-    Unloaded="Page_Unloaded"
+    Unloaded="Page_Unloaded" 
+    Width="640" Height="480"
     >
     <!--Source="{x:Bind mediacore:MediaSource.CreateFromUri(rootPage.CaptionedMediaUri)}"-->
 
-    <StackPanel x:Name="_mainPanel" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Orientation="Vertical">
+    <Grid x:Name="_mainPanel" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <MediaPlayerElement x:Name="_playerElement"
                             AutoPlay="False" 
-                            Margin="5" 
-                            HorizontalAlignment="Stretch" Height="720" 
-                            AreTransportControlsEnabled="True"/>
+                            Margin="0"
+                            Stretch="UniformToFill"
+                            AreTransportControlsEnabled="False"/>
 
-        <StackPanel Orientation="Horizontal">
-            <Button Content="Play"></Button>
-        </StackPanel>
-    </StackPanel>
+    </Grid>
 </Page>

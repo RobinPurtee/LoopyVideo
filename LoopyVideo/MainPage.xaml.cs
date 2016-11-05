@@ -77,7 +77,7 @@ namespace LoopyVideo
             try
             {
 
-                //_playerElement.IsFullWindow = true;
+                _playerElement.IsFullWindow = false;
 
                 MediaPlayer player = _playerElement.MediaPlayer;
                 player.Source = await GetCurrentMediaSourceAsync();
@@ -104,7 +104,7 @@ namespace LoopyVideo
             catch(Exception ex)
             {
                 MessageDialog dialog = new MessageDialog(ex.Message);
-                await dialog.ShowAsync();
+                dialog.ShowAsync();
             }
 
         }
@@ -118,12 +118,17 @@ namespace LoopyVideo
                 updateTime += TimeSpan.FromSeconds(1.0);
             }
         }
-
+        /// <summary>
+        /// Playback State Changed
+        /// </summary>
         private void Player_PlaybackStateChanged(MediaPlaybackSession sender, object args)
         {
             Debug.WriteLine("PlayBack Session State Changed to: " + sender.PlaybackState.ToString());
         }
 
+        /// <summary>
+        /// Natural VideoSize Changed
+        /// </summary>
         private void Player_NaturalVideoSizeChanged(MediaPlaybackSession sender, object args)
         {
             Size size = new Windows.Foundation.Size(sender.NaturalVideoWidth, sender.NaturalVideoHeight);
@@ -163,8 +168,25 @@ namespace LoopyVideo
 
         private void Player_MediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
         {
-            Debug.WriteLine("The media source has failed : " + args.ErrorMessage);
+            string errorName = string.Format("MediaPlayerError_{0}", args.Error.ToString());
+            try
+            {
+                var ignored = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => {
+                    string errorMessage; 
+                    //errorMessage = (string)Application.Current.Resources[errorName];
+                    var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+                    errorMessage = loader.GetString(errorName);
 
+                    Debug.WriteLine("The media source has failed : " + errorMessage);
+                    MessageDialog dialog = new MessageDialog(errorMessage);
+                    dialog.ShowAsync();
+
+                });
+            }
+            catch(Exception ex)
+            {
+                Debug.WriteLine("Error getting error message: {0}", ex.Message);
+            }
         }
 
         private void Player_BufferingStarted(MediaPlaybackSession sender, object args)
