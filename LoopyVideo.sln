@@ -5,6 +5,8 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyVideo", "LoopyVideo\LoopyVideo.csproj", "{C72F9420-C90A-4903-99D7-3C7B3CA899F3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyWebService", "LoopyWebService\LoopyWebService.csproj", "{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -31,6 +33,24 @@ Global
 		{C72F9420-C90A-4903-99D7-3C7B3CA899F3}.Release|x64.Deploy.0 = Release|x64
 		{C72F9420-C90A-4903-99D7-3C7B3CA899F3}.Release|x86.ActiveCfg = Release|x86
 		{C72F9420-C90A-4903-99D7-3C7B3CA899F3}.Release|x86.Build.0 = Release|x86
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|ARM.ActiveCfg = Debug|ARM
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|ARM.Build.0 = Debug|ARM
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|ARM.Deploy.0 = Debug|ARM
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x64.ActiveCfg = Debug|x64
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x64.Build.0 = Debug|x64
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x64.Deploy.0 = Debug|x64
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x86.ActiveCfg = Debug|x86
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x86.Build.0 = Debug|x86
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x86.Deploy.0 = Debug|x86
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|ARM.ActiveCfg = Release|ARM
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|ARM.Build.0 = Release|ARM
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|ARM.Deploy.0 = Release|ARM
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x64.ActiveCfg = Release|x64
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x64.Build.0 = Release|x64
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x64.Deploy.0 = Release|x64
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x86.ActiveCfg = Release|x86
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x86.Build.0 = Release|x86
+		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
