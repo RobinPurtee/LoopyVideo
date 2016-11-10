@@ -30,9 +30,19 @@ namespace LoopyVideo
     /// </summary>
     public sealed partial class MainPage : Page
     {
-        private string mediaFile = "/Assets/Test2.mp4";
 
-        private Uri _mediaBaseUri;
+
+        public string MediaUri
+        {
+            get { return (string)GetValue(MediaUriProperty); }
+            set { SetValue(MediaUriProperty, value); }
+        }
+
+        // Using a DependencyProperty as the backing store for MediaUri.  This enables animation, styling, binding, etc...
+        public static readonly DependencyProperty MediaUriProperty =
+            DependencyProperty.Register("MediaUri", typeof(string), typeof(LoopyVideo.MainPage), new PropertyMetadata(0));
+
+
 
         private MediaSource _media;
         public MediaSource Source
@@ -48,28 +58,80 @@ namespace LoopyVideo
             StorageFolder folder = lib.SaveFolder;
             Debug.WriteLine(string.Format("The video library path is: {0}", folder.Path));
             return folder;
-        } 
+        }
 
-
-        private async Task<MediaSource> GetCurrentMediaSourceAsync()
+        private async Task<StorageFile> GetDefaultMediaStorageFileAsync()
         {
             StorageFolder folder = await GetBaseFolderAsync();
             // Get the files in the SaveFolder folder.
             IReadOnlyList<StorageFile> filesList = await folder.GetFilesAsync();
-            if(filesList.Count == 0)
+            if (filesList.Count == 0)
             {
                 throw new FileNotFoundException("There are no files in the video library");
             }
-            Debug.WriteLine(string.Format("The video file is: {0}", filesList.First().Path));
-            return MediaSource.CreateFromStorageFile(filesList.First());
+            Debug.WriteLine(string.Format("The default video file is: {0}", filesList.First().Path));
+            return filesList.First();
         }
 
-        
+        private async Task<Uri> GetDefaultMediaUriAsync()
+        {           
+            return new Uri((await GetDefaultMediaStorageFileAsync()).Path);
+        }
+
+        private async Task<MediaSource> GetMediaSource()
+        {
+            MediaSource ret = null;
+            ApplicationDataContainer settings = ApplicationData.Current.LocalSettings;
+
+            string uriString = (string)settings.Values["mediaSource"];
+            if(null == uriString)
+            {
+                //uriString = (await GetDefaultMediaUriAsync()).ToString();
+                //settings.Values["mediaSource"] = uriString.ToString();
+            }
+            MediaUri = uriString;
+            Uri mediaUri = new Uri(uriString);
+
+
+            //ret = MediaSource.CreateFromUri(mediaUri);
+            StorageFile mediaFile = await StorageFile.GetFileFromPathAsync(mediaUri.LocalPath);
+            ret = MediaSource.CreateFromStorageFile(mediaFile);
+            return ret;
+        }
+
+        private async Task<MediaPlayer> CreateMediaPlayer()
+        {
+            MediaPlayer player = _playerElement.MediaPlayer;
+            player.Source = await GetMediaSource();
+            player.RealTimePlayback = true;
+            player.PlaybackSession.PlaybackRate = 1.0;
+            player.AutoPlay = true;
+            //hook up event handlers
+            player.MediaEnded += Player_MediaEnded;
+            player.MediaFailed += Player_MediaFailed;
+            player.MediaOpened += Player_MediaOpened;
+            player.SourceChanged += Player_SourceChanged;
+            player.PlaybackSession.BufferingEnded += Player_BufferingEnded;
+            player.PlaybackSession.BufferingProgressChanged += Player_BufferingProgressChanged;
+            player.PlaybackSession.BufferingStarted += Player_BufferingStarted;
+            player.PlaybackSession.DownloadProgressChanged += Player_DownloadProgressChanged;
+            player.PlaybackSession.NaturalDurationChanged += Player_NaturalDurationChanged;
+            player.PlaybackSession.NaturalVideoSizeChanged += Player_NaturalVideoSizeChanged;
+            player.PlaybackSession.PlaybackRateChanged += Player_PlaybackRateChanged;
+            player.PlaybackSession.PlaybackStateChanged += Player_PlaybackStateChanged;
+            player.PlaybackSession.PositionChanged += Player_PositionChanged;
+            player.PlaybackSession.SeekCompleted += Player_SeekCompleted;
+
+            return player;
+        }
+
+
 
         public MainPage()
         {
             this.InitializeComponent();
-            _mediaBaseUri = BaseUri;
+            this.DataContext = this;
+            MediaUri = string.Empty;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -79,25 +141,7 @@ namespace LoopyVideo
 
                 _playerElement.IsFullWindow = false;
 
-                MediaPlayer player = _playerElement.MediaPlayer;
-                player.Source = await GetCurrentMediaSourceAsync();
-                player.RealTimePlayback = true;
-                player.PlaybackSession.PlaybackRate = 1.0;
-                player.AutoPlay = true;
-                player.MediaEnded += Player_MediaEnded;
-                player.MediaFailed += Player_MediaFailed;
-                player.MediaOpened += Player_MediaOpened;
-                player.SourceChanged += Player_SourceChanged;
-                player.PlaybackSession.BufferingEnded += Player_BufferingEnded;
-                player.PlaybackSession.BufferingProgressChanged += Player_BufferingProgressChanged;
-                player.PlaybackSession.BufferingStarted += Player_BufferingStarted;
-                player.PlaybackSession.DownloadProgressChanged += Player_DownloadProgressChanged;
-                player.PlaybackSession.NaturalDurationChanged += Player_NaturalDurationChanged;
-                player.PlaybackSession.NaturalVideoSizeChanged += Player_NaturalVideoSizeChanged;
-                player.PlaybackSession.PlaybackRateChanged += Player_PlaybackRateChanged;
-                player.PlaybackSession.PlaybackStateChanged += Player_PlaybackStateChanged;
-                player.PlaybackSession.PositionChanged += Player_PositionChanged;
-                player.PlaybackSession.SeekCompleted += Player_SeekCompleted;
+                await CreateMediaPlayer();
 
 
             }
@@ -212,7 +256,42 @@ namespace LoopyVideo
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
+            _playerElement.MediaPlayer.Dispose();  
         }
 
+        private async void SetUriButton_Click(object sender, RoutedEventArgs e)
+        {
+            ApplicationData.Current.LocalSettings.Values["mediaSource"] = MediaUri;
+
+            MediaPlayer player = _playerElement.MediaPlayer;
+            if(player.PlaybackSession.CanPause)
+            {
+                player.Pause();
+            }
+            player.Source = await GetMediaSource();
+            player.Play();
+        }
+
+        private async void filePick_Click(object sender, RoutedEventArgs e)
+        {
+            var picker = new Windows.Storage.Pickers.FileOpenPicker();
+            picker.ViewMode = Windows.Storage.Pickers.PickerViewMode.Thumbnail;
+            picker.SuggestedStartLocation =  Windows.Storage.Pickers.PickerLocationId.VideosLibrary;
+            picker.FileTypeFilter.Add(".mp4");
+            picker.FileTypeFilter.Add(".mkv");
+            picker.FileTypeFilter.Add(".wmv");
+            picker.FileTypeFilter.Add(".avi");
+
+            Windows.Storage.StorageFile file = await picker.PickSingleFileAsync();
+            if (file != null)
+            {
+                // Application now has read/write access to the picked file
+                MediaUri = new Uri(file.Path).ToString();
+                ApplicationData.Current.LocalSettings.Values["mediaSource"] = MediaUri;
+ 
+
+            }
+ 
+        }
     }
 }

@@ -9,16 +9,22 @@
     mc:Ignorable="d"
     Loaded="Page_Loaded"
     Unloaded="Page_Unloaded" 
-    Width="640" Height="480"
+    Width="720" Height="512"
     >
     <!--Source="{x:Bind mediacore:MediaSource.CreateFromUri(rootPage.CaptionedMediaUri)}"-->
 
-    <Grid x:Name="_mainPanel" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <StackPanel x:Name="_mainPanel" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Orientation="Vertical">
         <MediaPlayerElement x:Name="_playerElement"
                             AutoPlay="False" 
                             Margin="0"
                             Stretch="UniformToFill"
+                            Width="640" Height="480"
                             AreTransportControlsEnabled="False"/>
-
-    </Grid>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Video Uri:"/>
+            <TextBox Text="{x:Bind MediaUri,Mode=TwoWay}" Width="300"/>
+            <Button x:Name="filePick" Content="..." Margin="3" Click="filePick_Click"/>
+            <Button x:Name="SetUriButton" Content="Load" Click="SetUriButton_Click" Margin="3"/>
+        </StackPanel>
+    </StackPanel>
 </Page>
