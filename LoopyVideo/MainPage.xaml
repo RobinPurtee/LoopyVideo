@@ -12,7 +12,9 @@
     Width="720" Height="512"
     >
     <!--Source="{x:Bind mediacore:MediaSource.CreateFromUri(rootPage.CaptionedMediaUri)}"-->
-
+    <Page.Resources>
+        <local:UriConverter x:Key="TwoWayUriConverter"/>
+    </Page.Resources>
     <StackPanel x:Name="_mainPanel" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Orientation="Vertical">
         <MediaPlayerElement x:Name="_playerElement"
                             AutoPlay="False" 
@@ -22,7 +24,7 @@
                             AreTransportControlsEnabled="False"/>
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="Video Uri:"/>
-            <TextBox Text="{x:Bind MediaUri,Mode=TwoWay}" Width="300"/>
+            <TextBox Text="{x:Bind MediaUri,Mode=TwoWay,Converter={StaticResource TwoWayUriConverter}}" Width="300"/>
             <Button x:Name="filePick" Content="..." Margin="3" Click="filePick_Click"/>
             <Button x:Name="SetUriButton" Content="Load" Click="SetUriButton_Click" Margin="3"/>
         </StackPanel>

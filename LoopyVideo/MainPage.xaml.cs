@@ -32,15 +32,46 @@ namespace LoopyVideo
     {
 
 
-        public string MediaUri
+        public Uri MediaUri
         {
-            get { return (string)GetValue(MediaUriProperty); }
+            get { return (Uri)GetValue(MediaUriProperty); }
             set { SetValue(MediaUriProperty, value); }
         }
 
         // Using a DependencyProperty as the backing store for MediaUri.  This enables animation, styling, binding, etc...
-        public static readonly DependencyProperty MediaUriProperty =
-            DependencyProperty.Register("MediaUri", typeof(string), typeof(LoopyVideo.MainPage), new PropertyMetadata(0));
+        private static readonly DependencyProperty MediaUriProperty =
+            DependencyProperty.Register(
+                "MediaUri",
+                typeof(string),
+                typeof(LoopyVideo.MainPage),
+                PropertyMetadata.Create(
+                    () =>
+                    {
+                        Uri ret = null;
+                        string uriStr = (string)ApplicationData.Current.LocalSettings.Values["mediaSource"];
+                        if (string.IsNullOrEmpty(uriStr))
+                        {
+                            ret = Task.Run(MainPage.GetDefaultMediaUriAsync).Result;
+                        }
+                        else
+                        {
+                            ret = new Uri(uriStr);
+                        }
+                        return ret;
+                    },
+                    (o, e) =>
+                    {
+                        Uri oldValue = e.OldValue as Uri;
+                        Uri newValue = e.NewValue as Uri;
+                        if (newValue != oldValue)
+                        {
+                            ApplicationData.Current.LocalSettings.Values["mediaSource"] = newValue.ToString();
+
+                        }
+
+                    }
+                )
+            );
 
 
 
@@ -51,8 +82,8 @@ namespace LoopyVideo
             private set { _media = value; }
         }
 
-
-        private async Task<StorageFolder> GetBaseFolderAsync()
+ 
+        private static async Task<StorageFolder> GetBaseFolderAsync()
         {
             StorageLibrary lib = await StorageLibrary.GetLibraryAsync(KnownLibraryId.Videos);
             StorageFolder folder = lib.SaveFolder;
@@ -60,7 +91,7 @@ namespace LoopyVideo
             return folder;
         }
 
-        private async Task<StorageFile> GetDefaultMediaStorageFileAsync()
+        private static async Task<StorageFile> GetDefaultMediaStorageFileAsync()
         {
             StorageFolder folder = await GetBaseFolderAsync();
             // Get the files in the SaveFolder folder.
@@ -73,7 +104,7 @@ namespace LoopyVideo
             return filesList.First();
         }
 
-        private async Task<Uri> GetDefaultMediaUriAsync()
+        private static async Task<Uri> GetDefaultMediaUriAsync()
         {           
             return new Uri((await GetDefaultMediaStorageFileAsync()).Path);
         }
@@ -83,19 +114,17 @@ namespace LoopyVideo
             MediaSource ret = null;
             ApplicationDataContainer settings = ApplicationData.Current.LocalSettings;
 
-            string uriString = (string)settings.Values["mediaSource"];
-            if(null == uriString)
+
+            if (MediaUri.IsFile)
             {
-                //uriString = (await GetDefaultMediaUriAsync()).ToString();
-                //settings.Values["mediaSource"] = uriString.ToString();
+                StorageFile mediaFile = await StorageFile.GetFileFromPathAsync(MediaUri.LocalPath);
+                ret = MediaSource.CreateFromStorageFile(mediaFile);
             }
-            MediaUri = uriString;
-            Uri mediaUri = new Uri(uriString);
+            else
+            {
+                ret = MediaSource.CreateFromUri(MediaUri);
 
-
-            //ret = MediaSource.CreateFromUri(mediaUri);
-            StorageFile mediaFile = await StorageFile.GetFileFromPathAsync(mediaUri.LocalPath);
-            ret = MediaSource.CreateFromStorageFile(mediaFile);
+            }
             return ret;
         }
 
@@ -131,7 +160,6 @@ namespace LoopyVideo
         {
             this.InitializeComponent();
             this.DataContext = this;
-            MediaUri = string.Empty;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -148,7 +176,7 @@ namespace LoopyVideo
             catch(Exception ex)
             {
                 MessageDialog dialog = new MessageDialog(ex.Message);
-                dialog.ShowAsync();
+                await dialog.ShowAsync();
             }
 
         }
@@ -261,7 +289,6 @@ namespace LoopyVideo
 
         private async void SetUriButton_Click(object sender, RoutedEventArgs e)
         {
-            ApplicationData.Current.LocalSettings.Values["mediaSource"] = MediaUri;
 
             MediaPlayer player = _playerElement.MediaPlayer;
             if(player.PlaybackSession.CanPause)
@@ -286,10 +313,7 @@ namespace LoopyVideo
             if (file != null)
             {
                 // Application now has read/write access to the picked file
-                MediaUri = new Uri(file.Path).ToString();
-                ApplicationData.Current.LocalSettings.Values["mediaSource"] = MediaUri;
- 
-
+                MediaUri = new Uri(file.Path);
             }
  
         }
