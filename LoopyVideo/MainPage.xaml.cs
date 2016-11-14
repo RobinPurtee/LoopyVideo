@@ -6,18 +6,10 @@ using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Composition;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Hosting;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using Windows.Media.Playback;
 using Windows.Media.Core;
 
@@ -66,7 +58,6 @@ namespace LoopyVideo
                         if (newValue != oldValue)
                         {
                             ApplicationData.Current.LocalSettings.Values["mediaSource"] = newValue.ToString();
-
                         }
 
                     }
@@ -82,7 +73,10 @@ namespace LoopyVideo
             private set { _media = value; }
         }
 
- 
+        /// <summary>
+        /// Get the base folder (default to the Video library)
+        /// </summary>
+        /// <returns>The base folder to use </returns>
         private static async Task<StorageFolder> GetBaseFolderAsync()
         {
             StorageLibrary lib = await StorageLibrary.GetLibraryAsync(KnownLibraryId.Videos);
@@ -91,6 +85,10 @@ namespace LoopyVideo
             return folder;
         }
 
+        /// <summary>
+        /// Get the default media file object
+        /// </summary>
+        /// <returns></returns>
         private static async Task<StorageFile> GetDefaultMediaStorageFileAsync()
         {
             StorageFolder folder = await GetBaseFolderAsync();
@@ -104,11 +102,18 @@ namespace LoopyVideo
             return filesList.First();
         }
 
+        /// <summary>
+        /// Get the default media uri
+        /// </summary>
+        /// <returns></returns>
         private static async Task<Uri> GetDefaultMediaUriAsync()
         {           
             return new Uri((await GetDefaultMediaStorageFileAsync()).Path);
         }
 
+        /// <summary>
+        /// Get the MediaSource 
+        /// </summary>
         private async Task<MediaSource> GetMediaSource()
         {
             MediaSource ret = null;
@@ -128,7 +133,10 @@ namespace LoopyVideo
             return ret;
         }
 
-        private async Task<MediaPlayer> CreateMediaPlayer()
+        /// <summary>
+        /// Initialize the MediaPlayer of the Player control
+        /// </summary>
+        private async Task InitMediaPlayer()
         {
             MediaPlayer player = _playerElement.MediaPlayer;
             player.Source = await GetMediaSource();
@@ -150,18 +158,23 @@ namespace LoopyVideo
             player.PlaybackSession.PlaybackStateChanged += Player_PlaybackStateChanged;
             player.PlaybackSession.PositionChanged += Player_PositionChanged;
             player.PlaybackSession.SeekCompleted += Player_SeekCompleted;
-
-            return player;
         }
 
 
-
+        /// <summary>
+        /// Constructor
+        /// </summary>
         public MainPage()
         {
             this.InitializeComponent();
             this.DataContext = this;
         }
 
+        /// <summary>
+        /// Handler for the page being loaded
+        /// </summary>
+        /// <param name="sender">the frame that loaded it</param>
+        /// <param name="e">N/A</param>
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             try
@@ -169,14 +182,14 @@ namespace LoopyVideo
 
                 _playerElement.IsFullWindow = false;
 
-                await CreateMediaPlayer();
+                await InitMediaPlayer();
 
 
             }
             catch(Exception ex)
             {
                 MessageDialog dialog = new MessageDialog(ex.Message);
-                await dialog.ShowAsync();
+                dialog.ShowAsync();
             }
 
         }
@@ -199,19 +212,31 @@ namespace LoopyVideo
         }
 
         /// <summary>
-        /// Natural VideoSize Changed
+        /// Natural VideoSize Changed handle
         /// </summary>
+        /// <param name="sender">the MediaPlaybackSession that changed </param>
+        /// <param name="args"></param>
         private void Player_NaturalVideoSizeChanged(MediaPlaybackSession sender, object args)
         {
             Size size = new Windows.Foundation.Size(sender.NaturalVideoWidth, sender.NaturalVideoHeight);
             Debug.WriteLine("Natural Video Size Changed to: " + size.ToString());
         }
 
+        /// <summary>
+        /// Download progress handler
+        /// </summary>
+        /// <param name="sender">the MediaPlaybackSession that changed </param>
+        /// <param name="args"></param>
         private void Player_DownloadProgressChanged(MediaPlaybackSession sender, object args)
         {
             Debug.WriteLine("Current DownloadProgress: " + sender.DownloadProgress.ToString());
         }
 
+        /// <summary>
+        /// Buffering Progress handler
+        /// </summary>
+        /// <param name="sender">the MediaPlaybackSession that changed </param>
+        /// <param name="args"></param>
         private void Player_BufferingProgressChanged(MediaPlaybackSession sender, object args)
         {
             Debug.WriteLine("Buffer Progress is currently: " + sender.BufferingProgress.ToString());
@@ -238,6 +263,11 @@ namespace LoopyVideo
             Debug.WriteLine("The Player opened :" + sender.Source.ToString());
         }
 
+        /// <summary>
+        /// Media playback error handler
+        /// </summary>
+        /// <param name="sender">the MediaPlayer that sent the error;</param>
+        /// <param name="args"></param>
         private void Player_MediaFailed(MediaPlayer sender, MediaPlayerFailedEventArgs args)
         {
             string errorName = string.Format("MediaPlayerError_{0}", args.Error.ToString());
@@ -271,6 +301,11 @@ namespace LoopyVideo
             Debug.WriteLine("Buffer has started");
         }
 
+        /// <summary>
+        /// Seek has completed, restart playback
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void Player_SeekCompleted(MediaPlaybackSession sender, object args)
         {
             sender.MediaPlayer.Play();
@@ -281,12 +316,22 @@ namespace LoopyVideo
             sender.PlaybackSession.Position = TimeSpan.Zero;
             updateTime = TimeSpan.Zero;
         }
-
+        
+        /// <summary>
+        ///  Page Unload handler
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            _playerElement.MediaPlayer.Dispose();  
+            ((MediaSource)_playerElement.MediaPlayer.Source).Dispose();  
         }
 
+        /// <summary>
+        /// change the media source
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void SetUriButton_Click(object sender, RoutedEventArgs e)
         {
 
@@ -299,6 +344,11 @@ namespace LoopyVideo
             player.Play();
         }
 
+        /// <summary>
+        /// File picker
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void filePick_Click(object sender, RoutedEventArgs e)
         {
             var picker = new Windows.Storage.Pickers.FileOpenPicker();
