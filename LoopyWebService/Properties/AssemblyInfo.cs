@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("LoopyWebService")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("LoopyVideo.WebServer")]
+[assembly: AssemblyDescription("The Web Server Background component for LoopVideo")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("LoopyWebService")]
+[assembly: AssemblyCompany("Code Manipulator")]
+[assembly: AssemblyProduct("Loopy Video")]
 [assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

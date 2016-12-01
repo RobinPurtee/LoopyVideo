@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyVideo", "LoopyVideo\LoopyVideo.csproj", "{C72F9420-C90A-4903-99D7-3C7B3CA899F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyWebService", "LoopyWebService\LoopyWebService.csproj", "{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyVideo.WebServer", "LoopyWebService\LoopyVideo.WebServer.csproj", "{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
