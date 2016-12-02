@@ -12,7 +12,7 @@ namespace LoopyVideo
     {
         private static string serverName = "LoopyVideo.WebServer";
 
-        BackgroundTaskRegistration server_ = null;
+        BackgroundTaskRegistration _server = null;
 
         public bool IsRegistered
         {
@@ -47,8 +47,8 @@ namespace LoopyVideo
                 builder.TaskEntryPoint = "LoopyVideo.WebServer.Server";
                 builder.IsNetworkRequested = true;
                 builder.AddCondition(new SystemCondition(SystemConditionType.FreeNetworkAvailable));
-                server_ = builder.Register();
-                server_.Completed += OnServerExit;   
+                _server = builder.Register();
+                _server.Completed += OnServerExit;   
               
             }
 
@@ -57,7 +57,7 @@ namespace LoopyVideo
 
         private void OnServerExit(IBackgroundTaskRegistration sender, BackgroundTaskCompletedEventArgs args)
         {
-            server_.Unregister(false);
+            _server.Unregister(false);
         }
 
 

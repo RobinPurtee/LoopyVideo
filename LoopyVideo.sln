@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyVideo", "LoopyVideo\Lo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyVideo.WebServer", "LoopyWebService\LoopyVideo.WebServer.csproj", "{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopVideo.AppService", "LoopVideo.AppService\LoopVideo.AppService.csproj", "{3C235BB3-C10F-454E-AD89-77640BC407DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -51,6 +53,24 @@ Global
 		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x86.ActiveCfg = Release|x86
 		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x86.Build.0 = Release|x86
 		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x86.Deploy.0 = Release|x86
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Debug|ARM.ActiveCfg = Debug|ARM
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Debug|ARM.Build.0 = Debug|ARM
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Debug|ARM.Deploy.0 = Debug|ARM
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Debug|x64.ActiveCfg = Debug|x64
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Debug|x64.Build.0 = Debug|x64
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Debug|x64.Deploy.0 = Debug|x64
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Debug|x86.ActiveCfg = Debug|x86
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Debug|x86.Build.0 = Debug|x86
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Debug|x86.Deploy.0 = Debug|x86
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Release|ARM.ActiveCfg = Release|ARM
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Release|ARM.Build.0 = Release|ARM
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Release|ARM.Deploy.0 = Release|ARM
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Release|x64.ActiveCfg = Release|x64
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Release|x64.Build.0 = Release|x64
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Release|x64.Deploy.0 = Release|x64
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Release|x86.ActiveCfg = Release|x86
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Release|x86.Build.0 = Release|x86
+		{3C235BB3-C10F-454E-AD89-77640BC407DA}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
