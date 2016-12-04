@@ -8,9 +8,10 @@ using Restup.Webserver.Rest;
 using Restup.Webserver.Attributes;
 using Restup.Webserver.Models.Contracts;
 using Restup.Webserver.Models.Schemas;
+using Windows.Foundation.Collections;
 
 
-namespace LoopVideo.AppService
+namespace LoopyVideo.AppService
 {
     [RestController(InstanceCreationType.Singleton)]
     class LoopyCommandController
@@ -18,30 +19,32 @@ namespace LoopVideo.AppService
         [UriFormat("/Play")]
         public IGetResponse PlayCommand()
         {
-            LoopyCommand lc = new LoopyCommand(LoopyCommandType.Play, string.Empty);
+            //LoopyCommand lc = new LoopyCommand(LoopyCommand.CommandType.Play, string.Empty);
 
-            if (AppConnection.IsValid)
-            {
-                AppConnection.Instance.SendCommand(lc);
-            }
+            //if (LoopyAppConnection.IsValid)
+            //{
+            //    Task.Run<ValueSet>(LoopyAppConnection.Instance.SendCommandAsync(lc)).Wait();
+            //}
 
-            var response = new GetResponse(GetResponse.ResponseStatus.OK, lc);
-            Debug.WriteLine("server responeding with: {0}", response);
+            //var response = new GetResponse(GetResponse.ResponseStatus.OK, lc);
+            var response = new GetResponse(GetResponse.ResponseStatus.OK);
+            Debug.WriteLine("server responding with: {0}", response);
             return response;
         }
 
         [UriFormat("/Stop")]
         public IGetResponse StopCommand()
         {
-            LoopyCommand lc = new LoopyCommand(LoopyCommandType.Stop, string.Empty);
+            //LoopyCommand lc = new LoopyCommand(LoopyCommand.CommandType.Stop, string.Empty);
 
-            if (AppConnection.IsValid)
-            {
-                AppConnection.Instance.SendCommand(lc);
-            }
+            //if (LoopyAppConnection.IsValid)
+            //{
+            //    LoopyAppConnection.Instance.SendCommand(lc);
+            //}
 
-            var response = new GetResponse(GetResponse.ResponseStatus.OK, lc);
-            Debug.WriteLine("server responeding with: {0}", response);
+            //var response = new GetResponse(GetResponse.ResponseStatus.OK, lc);
+            var response = new GetResponse(GetResponse.ResponseStatus.OK);
+            Debug.WriteLine("server responding with: {0}", response);
             return response;
         }
     }

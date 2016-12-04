@@ -1,0 +1,1 @@
+\\FRANK\Projects\WindowIOT\LoopyVideo\LoopyAppServiceTest\LoopyAppServiceTest.csproj;arm

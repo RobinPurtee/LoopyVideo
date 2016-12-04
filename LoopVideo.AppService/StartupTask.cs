@@ -3,12 +3,10 @@ using System.Diagnostics;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.AppService;
 using Windows.ApplicationModel.Background;
-using Windows.Foundation.Collections;
 using Restup.Webserver.Rest;
-using Restup.Webserver.Attributes;
 using Restup.Webserver.Http;
 
-namespace LoopVideo.AppService
+namespace LoopyVideo.AppService
 {
     public sealed class StartupTask : IBackgroundTask
     {
@@ -19,13 +17,14 @@ namespace LoopVideo.AppService
 
         public void Run(IBackgroundTaskInstance taskInstance)
         {
+            Debug.WriteLine($"The packagename is: {Windows.ApplicationModel.Package.Current.Id.FamilyName}");
             // save the defferal to keep the server running until the instance is Canceled
             _defferral = taskInstance.GetDeferral();
             taskInstance.Canceled += Server_Canceled;
 
             // setup the AppService Connection
             var serviceTrigger = taskInstance.TriggerDetails as AppServiceTriggerDetails;
-            AppConnection.Instance.Connection = serviceTrigger.AppServiceConnection;
+//            LoopyAppConnection.Instance.Connection = serviceTrigger.AppServiceConnection;
 
             // setup the the web server
             var restRouteHandler = new RestRouteHandler();

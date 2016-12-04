@@ -1,0 +1,48 @@
+﻿<Page
+    x:Class="LoopyAppServiceTest.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LoopyAppServiceTest"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <Style x:Name="MediaButton" TargetType="Button">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="Margin" Value="10"/>
+        </Style>
+
+    </Page.Resources>
+
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition />
+            <RowDefinition Height="Auto" MinHeight="513.4" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="144"/>
+            <ColumnDefinition Width="131.4"/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+        <Button x:Name="StartServiceBtn" 
+                Content="Start Service" 
+                Click="StartService_Click" HorizontalAlignment="Center" VerticalAlignment="Center" Height="33" Margin="20,9,22,8.4" Width="102"/>
+        <TextBlock  Grid.Column="1" Text="Connection Status: " HorizontalAlignment="Right" VerticalAlignment="Center" Height="20" Margin="0,15,0.4,15.4" Width="123"/>
+        <TextBlock Text="{Binding Path=ConnectionStatus}" 
+                   HorizontalAlignment="Left" VerticalAlignment="Center" 
+                   TextWrapping="Wrap" Grid.Column="2"/>
+        <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
+            <Button x:Name="Play" Style="{StaticResource MediaButton}" Content="Play" Click="Play_Click"/>
+            <Button x:Name="Stop" Style="{StaticResource MediaButton}" Content="Stop" Click="Stop_Click"/>
+        </StackPanel>
+        <TextBlock Grid.Column="1" 
+                   Grid.Row="1" 
+                   HorizontalAlignment="Right" VerticalAlignment="Center" 
+                   Text="Playback Status: "  />
+        <TextBlock Grid.Row="1" Grid.Column="2"
+                   HorizontalAlignment="Left" VerticalAlignment="Center" 
+                   Text="{Binding Path=PlaybackStatus}"/>
+
+    </Grid>
+</Page>
