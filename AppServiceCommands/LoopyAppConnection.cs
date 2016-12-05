@@ -10,19 +10,6 @@ using Windows.Foundation.Collections;
 
 namespace LoopyVideo.Commands
 {
-    internal static class LoopyAppConnectionFactory
-    {
-        private static readonly Lazy<LoopyAppConnection> _instance = new Lazy<LoopyAppConnection>(() => new LoopyAppConnection());
-        internal static LoopyAppConnection Instance
-        {
-            get { return _instance.Value; }
-        }
-        internal static bool IsValid
-        {
-            get { return _instance.IsValueCreated && _instance.Value.Connection != null; }
-        }
-
-    }
 
     /// <summary>
     /// The connection between LoopyVideo.AppService and  the apps being serviced
@@ -32,7 +19,6 @@ namespace LoopyVideo.Commands
 
         private readonly static string ServiceName = "net.manipulatormanor.LoopyWebServer";
         private readonly static string ServiceFamilyName = "LoopyVideo.AppService-uwp_n1q2psqd6svm2";
-
 
         public event EventHandler<LoopyCommand> ReceiveCommand;
 
@@ -133,7 +119,7 @@ namespace LoopyVideo.Commands
 
         #endregion
 
-        public IAsyncOperation<bool> OpenConnectionAsync()
+        public IAsyncOperation<AppServiceConnectionStatus> OpenConnectionAsync()
         {
             return Task<bool>.Run(async () =>
             {
@@ -152,8 +138,8 @@ namespace LoopyVideo.Commands
                 {
                     Connection = connection;
                 }
-                return bRet;
-            }).AsAsyncOperation<bool>();
+                return Status;
+            }).AsAsyncOperation<AppServiceConnectionStatus>();
         }
 
         /// <summary>

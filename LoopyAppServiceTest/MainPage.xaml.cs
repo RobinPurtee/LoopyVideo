@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,10 +20,6 @@ namespace LoopyAppServiceTest
 {
     public sealed partial class MainPage : Page
     {
-        public MainPage()
-        {
-            this.InitializeComponent();
-        }
 
         public string ConnectionStatus
         {
@@ -71,20 +68,33 @@ namespace LoopyAppServiceTest
 
         private void CommandReceived(object sender, LoopyCommand e)
         {
-            throw new NotImplementedException();
+            Debug.WriteLine($"Command received: {e.ToString()}");
         }
+
+        public MainPage()
+        {
+            this.InitializeComponent();
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            DataContext = this;
+            ConnectionStatus = "The initial Status";
+        }
+
+
 
         private async void StartService_Click(object sender, RoutedEventArgs e)
         {
             
             // Add the connection.
-            if (!ServiceConnection.IsValid())
+            if (ServiceConnection == null || !ServiceConnection.IsValid())
             {
-                
-                if (!(await ServiceConnection.OpenConnectionAsync()))
+                if(ServiceConnection == null)
                 {
-                    ConnectionStatus = ServiceConnection.Status.ToString();
+                    ServiceConnection = new LoopyAppConnection();
                 }
+                ConnectionStatus = (await ServiceConnection.OpenConnectionAsync()).ToString();
             }
         }
 
@@ -117,5 +127,6 @@ namespace LoopyAppServiceTest
         {
             SendPlaybackCommand(LoopyCommand.CommandType.Stop);
         }
+
     }
 }

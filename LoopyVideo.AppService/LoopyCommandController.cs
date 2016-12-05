@@ -16,34 +16,32 @@ namespace LoopyVideo.AppService
     [RestController(InstanceCreationType.Singleton)]
     class LoopyCommandController
     {
+        private IGetResponse SendAppCommand(LoopyCommand.CommandType command, string param = "")
+        {
+            LoopyCommand lc = new LoopyCommand(LoopyCommand.CommandType.Play, string.Empty);
+            ValueSet commandReturnSet;
+            if (AppConnectionFactory.IsValid)
+            {
+                Task<ValueSet> sendTask = AppConnectionFactory.Instance.SendCommandAsync(lc).AsTask<ValueSet>();
+                sendTask.Wait();
+                commandReturnSet = sendTask.Result;
+            }
+
+            var response = new GetResponse(GetResponse.ResponseStatus.OK, lc);
+            Debug.WriteLine("Command responding with: {0}", response);
+            return response;
+        }
+
         [UriFormat("/Play")]
         public IGetResponse PlayCommand()
         {
-            LoopyCommand lc = new LoopyCommand(LoopyCommand.CommandType.Play, string.Empty);
-
-            //if (LoopyAppConnection.IsValid)
-            //{
-            //    Task.Run<ValueSet>(LoopyAppConnection.Instance.SendCommandAsync(lc)).Wait();
-            //}
-
-            var response = new GetResponse(GetResponse.ResponseStatus.OK, lc);
-            Debug.WriteLine("Play Command responding with: {0}", response);
-            return response;
+            return SendAppCommand(LoopyCommand.CommandType.Play);
         }
 
         [UriFormat("/Stop")]
         public IGetResponse StopCommand()
         {
-            LoopyCommand lc = new LoopyCommand(LoopyCommand.CommandType.Stop, string.Empty);
-
-            //if (LoopyAppConnection.IsValid)
-            //{
-            //    LoopyAppConnection.Instance.SendCommand(lc);
-            //}
-
-            var response = new GetResponse(GetResponse.ResponseStatus.OK, lc);
-            Debug.WriteLine("Stop Command responding with: {0}", response);
-            return response;
+            return SendAppCommand(LoopyCommand.CommandType.Stop);
         }
     }
 }

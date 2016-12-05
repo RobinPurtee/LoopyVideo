@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Windows.ApplicationModel.AppService;
 using Windows.ApplicationModel.Background;
+using Windows.Foundation.Collections;
 using Restup.Webserver.Rest;
 using Restup.Webserver.Http;
 
@@ -21,7 +18,7 @@ namespace LoopyVideo.AppService
         private HttpServer _webServer = null;
 
 
-        public void Run(IBackgroundTaskInstance taskInstance)
+        public async void Run(IBackgroundTaskInstance taskInstance)
         {
             Debug.WriteLine($"The packagename is: {Windows.ApplicationModel.Package.Current.Id.FamilyName}");
             // save the defferal to keep the server running until the instance is Canceled
@@ -30,7 +27,14 @@ namespace LoopyVideo.AppService
 
             // setup the AppService Connection
             var serviceTrigger = taskInstance.TriggerDetails as AppServiceTriggerDetails;
-            //            LoopyAppConnection.Instance.Connection = serviceTrigger.AppServiceConnection;
+            AppConnectionFactory.Instance.Connection = serviceTrigger.AppServiceConnection;
+
+            await AppConnectionFactory.Instance.OpenConnectionAsync();
+            if (AppConnectionFactory.Instance.Status == AppServiceConnectionStatus.Success )
+            {
+                AppConnectionFactory.Instance.ReceiveCommand += ReceiveAppCommand;
+            }
+
 
             // setup the the web server
             var restRouteHandler = new RestRouteHandler();
@@ -47,19 +51,16 @@ namespace LoopyVideo.AppService
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(string.Format("Web Server Exception: {0}", ex.Message));
+                Debug.WriteLine($"Web Server Exception: {ex.Message}");
             }
         }
 
-
-
-        /// <summary>
-        /// Receive request from LoopyVideo front-end
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="args"></param>
-        private void AppConnection__RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        private async void ReceiveAppCommand(object sender, Commands.LoopyCommand e)
         {
+            Debug.WriteLine($"Received {e.Command.ToString()} command from the Appication");
+            // echo the command back
+            ValueSet retset = await AppConnectionFactory.Instance.SendCommandAsync(e);
+            Debug.WriteLine($"Echo response is: {retset.ToString()}");
         }
 
         private void Server_Canceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
