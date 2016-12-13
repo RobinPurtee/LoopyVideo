@@ -32,35 +32,37 @@ namespace LoopyVideo.AppService
             await AppConnectionFactory.Instance.OpenConnectionAsync();
             if (AppConnectionFactory.Instance.Status == AppServiceConnectionStatus.Success )
             {
-                AppConnectionFactory.Instance.ReceiveCommand += ReceiveAppCommand;
+                AppConnectionFactory.Instance.MessageReceived += ReceiveAppCommand;
             }
 
 
             // setup the the web server
-            var restRouteHandler = new RestRouteHandler();
-            restRouteHandler.RegisterController<LoopyCommandController>();
-            var configuration = new HttpServerConfiguration()
-              .ListenOnPort(8800)
-              .RegisterRoute("loopy", restRouteHandler)
-              .EnableCors();
-            try
-            {
-                var _webServer = new HttpServer(configuration);
-                Task serverTask = Task.Run(_webServer.StartServerAsync);
-                serverTask.Wait();
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Web Server Exception: {ex.Message}");
-            }
+            //var restRouteHandler = new RestRouteHandler();
+            //restRouteHandler.RegisterController<LoopyCommandController>();
+            //var configuration = new HttpServerConfiguration()
+            //  .ListenOnPort(8800)
+            //  .RegisterRoute("loopy", restRouteHandler)
+            //  .EnableCors();
+            //try
+            //{
+            //    var _webServer = new HttpServer(configuration);
+            //    Task serverTask = Task.Run(_webServer.StartServerAsync);
+            //    serverTask.Wait();
+            //}
+            //catch (Exception ex)
+            //{
+            //    Debug.WriteLine($"Web Server Exception: {ex.Message}");
+            //}
         }
 
-        private async void ReceiveAppCommand(object sender, Commands.LoopyCommand e)
+        private ValueSet ReceiveAppCommand(ValueSet command)
         {
-            Debug.WriteLine($"Received {e.Command.ToString()} command from the Appication");
+            Debug.WriteLine($"Received {command.ToString()} command from the Appication");
+
             // echo the command back
-            ValueSet retset = await AppConnectionFactory.Instance.SendCommandAsync(e);
+            ValueSet retset = command;
             Debug.WriteLine($"Echo response is: {retset.ToString()}");
+            return retset;
         }
 
         private void Server_Canceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)

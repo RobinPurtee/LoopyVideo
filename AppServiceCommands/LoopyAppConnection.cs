@@ -11,19 +11,66 @@ using Windows.Foundation.Collections;
 namespace LoopyVideo.Commands
 {
 
+    internal static class ValueSetHelper
+    {
+        public static string ValueString(ValueSet values)
+        {
+            StringBuilder valueBuilder = new StringBuilder();
+            foreach(var pair in values)
+            {
+                if(valueBuilder.Length > 0)
+                {
+                    valueBuilder.Append(" | ");
+                }
+                valueBuilder.Append($"Key: {pair.Key} Value: {pair.Value}");
+            }
+
+            return valueBuilder.ToString();
+        }
+    }
+
     /// <summary>
     /// The connection between LoopyVideo.AppService and  the apps being serviced
     /// </summary>
     internal class LoopyAppConnection : IDisposable
     {
 
-        private readonly static string ServiceName = "net.manipulatormanor.LoopyWebServer";
-        private readonly static string ServiceFamilyName = "LoopyVideo.AppService-uwp_n1q2psqd6svm2";
+        private readonly static string _serviceNameDefault = "net.manipulatormanor.LoopyWebServer";
+        private readonly static string _serviceFamilyNameDefault = "LoopyVideo.AppService-uwp_n1q2psqd6svm2";
 
-        public event EventHandler<LoopyCommand> ReceiveCommand;
+        public delegate ValueSet ReceiveMessage(ValueSet message);
+        public event ReceiveMessage MessageReceived;
 
 
         // The instance of this class
+
+        private string _serviceName;
+        public string ServiceName
+        {
+            get
+            {
+                if(string.IsNullOrEmpty(_serviceName))
+                {
+                    _serviceName = _serviceNameDefault;
+                }
+                return _serviceName;
+            }
+            set { _serviceName = value; }
+        }
+
+        private string _familyName;
+        public string ServiceFamilyName
+        {
+            get
+            {
+                if (string.IsNullOrEmpty(_familyName))
+                {
+                    _familyName = _serviceFamilyNameDefault;
+                }
+                return _familyName;
+            }
+            set { _familyName = value; }
+        }
 
         private object _connectionLock = new object();    
         private AppServiceConnection _connection;
@@ -147,35 +194,9 @@ namespace LoopyVideo.Commands
         /// </summary>
         /// <param name="command">The command to send</param>
         /// <returns>The ValueSet containing the response</returns>
-        public IAsyncOperation<ValueSet> SendCommandAsync(LoopyCommand command)
+        public IAsyncOperation<AppServiceResponse> SendCommandAsync(ValueSet command)
         {
-            return Task<ValueSet>.Run(async () => { 
-                ValueSet outValueSet = new ValueSet();
-                ValueSet result;
-                try
-                {
-                    LoopyCommandHelper.AddToValueSet(command, outValueSet);
-
-                    AppServiceResponse response = await Connection.SendMessageAsync(outValueSet);
-                    if (response.Status == AppServiceResponseStatus.Success)
-                    {
-                        result = response.Message;
-                        Debug.WriteLine($"The client responded to the command with: {result.ToString()}");
-                    }
-                    else
-                    {
-                        result = new ValueSet();
-                        result.Clear();
-                    }
-
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Exception Sending action {command.ToString()} : {ex.Message} ");
-                    throw;
-                }
-                return result;
-            }).AsAsyncOperation<ValueSet>();
+            return Connection.SendMessageAsync(command);
         }
 
 
@@ -184,15 +205,17 @@ namespace LoopyVideo.Commands
         /// </summary>
         /// <param name="sender">The connection the message is from</param>
         /// <param name="args">The argurments fo the message</param>
-        private void RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
+        private async void RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
             var requestDefferal = args.GetDeferral();
-            Debug.WriteLine($"LoopyWebserver received the following message: {args.Request.Message.ToString()}");
-            if (ReceiveCommand != null)
+            Debug.WriteLine($"AppConnection.RequestReceived: received the following message: {ValueSetHelper.ValueString(args.Request.Message)}");
+            AppServiceResponseStatus status = AppServiceResponseStatus.Unknown;
+            if (ReceivedCommand != null)
             {
-                LoopyCommand lc = LoopyCommandHelper.FromValueSet(args.Request.Message);
-                ReceiveCommand(this, lc);
+                status = await args.Request.SendResponseAsync(ReceivedCommand(args.Request.Message));
             }
+
+            Debug.WriteLine($"Sending Response to Request returned: {status.ToString()}");
 
             requestDefferal.Complete();
         }
