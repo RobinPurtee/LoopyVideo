@@ -194,9 +194,12 @@ namespace LoopyVideo.Commands
         /// </summary>
         /// <param name="command">The command to send</param>
         /// <returns>The ValueSet containing the response</returns>
-        public IAsyncOperation<AppServiceResponse> SendCommandAsync(ValueSet command)
+        public IAsyncOperation<AppServiceResponse> SendCommandAsync(LoopyCommand command)
         {
-            return Connection.SendMessageAsync(command);
+            ValueSet messageSet = new ValueSet(); 
+            LoopyCommandHelper.AddToValueSet(command, messageSet);
+
+            return Connection.SendMessageAsync(messageSet);
         }
 
 
@@ -210,9 +213,9 @@ namespace LoopyVideo.Commands
             var requestDefferal = args.GetDeferral();
             Debug.WriteLine($"AppConnection.RequestReceived: received the following message: {ValueSetHelper.ValueString(args.Request.Message)}");
             AppServiceResponseStatus status = AppServiceResponseStatus.Unknown;
-            if (ReceivedCommand != null)
+            if (MessageReceived != null)
             {
-                status = await args.Request.SendResponseAsync(ReceivedCommand(args.Request.Message));
+                status = await args.Request.SendResponseAsync(MessageReceived(args.Request.Message));
             }
 
             Debug.WriteLine($"Sending Response to Request returned: {status.ToString()}");

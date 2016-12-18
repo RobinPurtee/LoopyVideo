@@ -112,19 +112,14 @@ namespace LoopyAppServiceTest
             {
                 try
                 {
-                    ValueSet response = await ServiceConnection.SendCommandAsync(lc);
-                    if (response.Any())
+                    AppServiceResponse response = await ServiceConnection.SendCommandAsync(lc);
+                    if (response.Status == AppServiceResponseStatus.Success)
                     {
-                        StringBuilder responseMessageBuilder = new StringBuilder();
-                        foreach(var pair in response)
-                        {
-                            responseMessageBuilder.Append($"Key: {pair.Key} Value: {pair.Value} | ");
-                        } 
-                        PlaybackStatus = response.ToString();
+                        PlaybackStatus = ValueSetHelper.ValueString(response.Message);
                     }
                     else
                     {
-                        PlaybackStatus = "Sending Command failed";
+                        PlaybackStatus = $"Sending Command Failed: {response.Status.ToString()}";
                     }
                 }
                 catch (Exception ex)
