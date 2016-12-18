@@ -24,6 +24,11 @@
         <uap:Extension Category="windows.appService" EntryPoint="LoopyVideo.AppService.StartupTask">
           <uap:AppService Name="net.manipulatormanor.LoopyWebServer" />
         </uap:Extension>
+        <Extension Category="windows.backgroundTasks" EntryPoint="LoopyVideo.AppService.StartupTask">
+          <BackgroundTasks>
+            <iot:Task Type="startup" />
+          </BackgroundTasks>
+        </Extension>
       </Extensions>
     </Application>
   </Applications>
