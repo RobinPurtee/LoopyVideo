@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using Windows.ApplicationModel.AppService;
 using LoopyVideo.Commands;
+using System.Text;
 
 namespace LoopyAppServiceTest
 {
@@ -55,20 +56,21 @@ namespace LoopyAppServiceTest
             {
                 if (_serviceConnection != null)
                 {
-                    _serviceConnection.ReceiveCommand -= CommandReceived;
+                    _serviceConnection.MessageReceived -= CommandReceived;
                     _serviceConnection.Dispose();
                 }
                 _serviceConnection = value;
                 if (_serviceConnection != null)
                 {
-                    _serviceConnection.ReceiveCommand += CommandReceived; ;
+                    _serviceConnection.MessageReceived += CommandReceived; ;
                 }
             }
         }
 
-        private void CommandReceived(object sender, LoopyCommand e)
+        private ValueSet CommandReceived(ValueSet set)
         {
-            Debug.WriteLine($"Command received: {e.ToString()}");
+            Debug.WriteLine($"Command received: {set.ToString()}");
+            return set;
         }
 
         public MainPage()
@@ -79,6 +81,11 @@ namespace LoopyAppServiceTest
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             DataContext = this;
+            if (ServiceConnection == null)
+            {
+                ServiceConnection = new LoopyAppConnection();
+            }
+
             ConnectionStatus = "The initial Status";
         }
 
@@ -90,10 +97,10 @@ namespace LoopyAppServiceTest
             // Add the connection.
             if (ServiceConnection == null || !ServiceConnection.IsValid())
             {
-                if(ServiceConnection == null)
-                {
-                    ServiceConnection = new LoopyAppConnection();
-                }
+                //if (ServiceConnection == null)
+                //{
+                //    ServiceConnection = new LoopyAppConnection();
+                //}
                 ConnectionStatus = (await ServiceConnection.OpenConnectionAsync()).ToString();
             }
         }
@@ -108,6 +115,11 @@ namespace LoopyAppServiceTest
                     ValueSet response = await ServiceConnection.SendCommandAsync(lc);
                     if (response.Any())
                     {
+                        StringBuilder responseMessageBuilder = new StringBuilder();
+                        foreach(var pair in response)
+                        {
+                            responseMessageBuilder.Append($"Key: {pair.Key} Value: {pair.Value} | ");
+                        } 
                         PlaybackStatus = response.ToString();
                     }
                     else
@@ -119,6 +131,10 @@ namespace LoopyAppServiceTest
                 {
                     PlaybackStatus = ex.Message;
                 }
+            }
+            else
+            {
+                PlaybackStatus = $"Service Connection is not valid";
             }
         }
 
