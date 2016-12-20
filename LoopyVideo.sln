@@ -5,9 +5,20 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyVideo", "LoopyVideo\LoopyVideo.csproj", "{C72F9420-C90A-4903-99D7-3C7B3CA899F3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyWebService", "LoopyWebService\LoopyWebService.csproj", "{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F8E6AA0E-ABF7-4219-9AB3-FA53176492C6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyAppServiceTest", "LoopyAppServiceTest\LoopyAppServiceTest.csproj", "{FF2ED7C1-C956-454D-A623-D02569EACFEF}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "LoopyVideo.Commands", "AppServiceCommands\LoopyVideo.Commands.shproj", "{27E084D3-3371-43A6-B6F5-796DA78720D8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyVideo.AppService", "LoopyVideo.AppService\LoopyVideo.AppService.csproj", "{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		AppServiceCommands\AppServiceCommands.projitems*{27e084d3-3371-43a6-b6f5-796da78720d8}*SharedItemsImports = 13
+		AppServiceCommands\AppServiceCommands.projitems*{59a8232e-2ba1-4e20-ad24-a02f99ee1ef2}*SharedItemsImports = 4
+		AppServiceCommands\AppServiceCommands.projitems*{ff2ed7c1-c956-454d-a623-d02569eacfef}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
 		Debug|x64 = Debug|x64
@@ -33,26 +44,47 @@ Global
 		{C72F9420-C90A-4903-99D7-3C7B3CA899F3}.Release|x64.Deploy.0 = Release|x64
 		{C72F9420-C90A-4903-99D7-3C7B3CA899F3}.Release|x86.ActiveCfg = Release|x86
 		{C72F9420-C90A-4903-99D7-3C7B3CA899F3}.Release|x86.Build.0 = Release|x86
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|ARM.ActiveCfg = Debug|ARM
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|ARM.Build.0 = Debug|ARM
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|ARM.Deploy.0 = Debug|ARM
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x64.ActiveCfg = Debug|x64
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x64.Build.0 = Debug|x64
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x64.Deploy.0 = Debug|x64
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x86.ActiveCfg = Debug|x86
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x86.Build.0 = Debug|x86
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Debug|x86.Deploy.0 = Debug|x86
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|ARM.ActiveCfg = Release|ARM
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|ARM.Build.0 = Release|ARM
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|ARM.Deploy.0 = Release|ARM
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x64.ActiveCfg = Release|x64
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x64.Build.0 = Release|x64
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x64.Deploy.0 = Release|x64
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x86.ActiveCfg = Release|x86
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x86.Build.0 = Release|x86
-		{A8FE3A32-0868-48C9-9C6C-C33B7CD6387E}.Release|x86.Deploy.0 = Release|x86
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Debug|ARM.ActiveCfg = Debug|ARM
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Debug|ARM.Build.0 = Debug|ARM
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Debug|ARM.Deploy.0 = Debug|ARM
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Debug|x64.ActiveCfg = Debug|x64
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Debug|x64.Build.0 = Debug|x64
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Debug|x64.Deploy.0 = Debug|x64
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Debug|x86.ActiveCfg = Debug|x86
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Debug|x86.Build.0 = Debug|x86
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Debug|x86.Deploy.0 = Debug|x86
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Release|ARM.ActiveCfg = Release|ARM
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Release|ARM.Build.0 = Release|ARM
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Release|ARM.Deploy.0 = Release|ARM
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Release|x64.ActiveCfg = Release|x64
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Release|x64.Build.0 = Release|x64
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Release|x64.Deploy.0 = Release|x64
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Release|x86.ActiveCfg = Release|x86
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Release|x86.Build.0 = Release|x86
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF}.Release|x86.Deploy.0 = Release|x86
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Debug|ARM.ActiveCfg = Debug|ARM
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Debug|ARM.Build.0 = Debug|ARM
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Debug|ARM.Deploy.0 = Debug|ARM
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Debug|x64.ActiveCfg = Debug|x64
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Debug|x64.Build.0 = Debug|x64
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Debug|x64.Deploy.0 = Debug|x64
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Debug|x86.ActiveCfg = Debug|x86
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Debug|x86.Build.0 = Debug|x86
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Debug|x86.Deploy.0 = Debug|x86
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Release|ARM.ActiveCfg = Release|ARM
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Release|ARM.Build.0 = Release|ARM
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Release|ARM.Deploy.0 = Release|ARM
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Release|x64.ActiveCfg = Release|x64
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Release|x64.Build.0 = Release|x64
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Release|x64.Deploy.0 = Release|x64
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Release|x86.ActiveCfg = Release|x86
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Release|x86.Build.0 = Release|x86
+		{59A8232E-2BA1-4E20-AD24-A02F99EE1EF2}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{FF2ED7C1-C956-454D-A623-D02569EACFEF} = {F8E6AA0E-ABF7-4219-9AB3-FA53176492C6}
 	EndGlobalSection
 EndGlobal
