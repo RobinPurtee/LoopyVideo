@@ -3,6 +3,11 @@ LoopyVideo/bin/
 LoopyVideo/Assets/Test2.mp4
 LoopyWebService/obj/
 LoopyWebService/bin/
+LoopyWebServer/obj/
+LoopVideo.AppService/obj/
+LoopVideo.AppService/bin/
+LoopyAppServiceTest/obj/
+LoopyAppServiceTest/bin/
 LoopyVideo.AppService/obj/
 LoopyVideo.AppService/bin/
 LoopyAppServiceTest/obj/
