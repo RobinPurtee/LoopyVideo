@@ -110,6 +110,10 @@ namespace LoopyAppServiceTest
                     {
                         PlaybackStatus = response.ToString();
                     }
+                    else
+                    {
+                        PlaybackStatus = "Sending Command failed";
+                    }
                 }
                 catch (Exception ex)
                 {
