@@ -11,3 +11,10 @@ LoopyAppServiceTest/bin/
 LoopyVideo.AppService/obj/
 LoopyVideo.AppService/bin/
 .vs/
+LoopyVideo.WebHost/obj/
+LoopyVideo.WebServiceComponent/bin/
+LoopyVideo.WebHost/bin/
+LoopyVideo.WebServiceComponent/obj/
+AppServiceUnitTest/obj/
+AppServiceUnitTest/bin/
+*.lock.json

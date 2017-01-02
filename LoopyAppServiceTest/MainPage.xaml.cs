@@ -21,11 +21,16 @@ namespace LoopyAppServiceTest
 {
     public sealed partial class MainPage : Page
     {
+        private LoopyVideo.Logging.Logger _log = new LoopyVideo.Logging.Logger("LoopyAppServiceTest");
 
         public string ConnectionStatus
         {
             get { return (string)GetValue(ConnectionStatusProperty); }
-            set { SetValue(ConnectionStatusProperty, value); }
+            set
+            {
+                _log.Infomation($"Setting Connection Status {value.ToString()}");
+                SetValue(ConnectionStatusProperty, value);
+            }
         }
 
         // Using a DependencyProperty as the backing store for ConnectionStatus.  This enables animation, styling, binding, etc...
@@ -37,7 +42,11 @@ namespace LoopyAppServiceTest
         public string PlaybackStatus
         {
             get { return (string)GetValue(PlaybackStatusProperty); }
-            set { SetValue(PlaybackStatusProperty, value); }
+            set
+            {
+                _log.Infomation($"Setting Playback Status {value.ToString()}");
+                SetValue(PlaybackStatusProperty, value);
+            }
         }
 
         // Using a DependencyProperty as the backing store for PlaybackStatus.  This enables animation, styling, binding, etc...
@@ -47,43 +56,53 @@ namespace LoopyAppServiceTest
 
 
 
-        private LoopyAppConnection _serviceConnection;
+        private AppConnection _serviceConnection;
 
-        private LoopyAppConnection ServiceConnection
+        private AppConnection ServiceConnection
         {
             get { return _serviceConnection; }
             set
             {
                 if (_serviceConnection != null)
                 {
+                    _log.Infomation("Disposing of old connection");
                     _serviceConnection.MessageReceived -= CommandReceived;
                     _serviceConnection.Dispose();
                 }
                 _serviceConnection = value;
                 if (_serviceConnection != null)
                 {
-                    _serviceConnection.MessageReceived += CommandReceived; ;
+                    _log.Infomation("new connection set");
+                    _serviceConnection.MessageReceived += CommandReceived;
                 }
             }
         }
 
         private ValueSet CommandReceived(ValueSet set)
         {
-            Debug.WriteLine($"Command received: {set.ToString()}");
+            _log.Infomation($"Command received: {set.ToString()}");
+            ValueSet retset = new ValueSet();
+            foreach(var pair in set)
+            {
+                retset.Add(pair);
+            }
+
             return set;
         }
 
         public MainPage()
         {
             this.InitializeComponent();
+            _log.Infomation("MainPage Created");
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            _log.Infomation("MainPage Loaded");
             DataContext = this;
             if (ServiceConnection == null)
             {
-                ServiceConnection = new LoopyAppConnection();
+                ServiceConnection = new AppConnection("LoopyVideo.AppServiceTest.ServiceConnection");
             }
 
             ConnectionStatus = "The initial Status";
@@ -97,9 +116,10 @@ namespace LoopyAppServiceTest
             // Add the connection.
             if (ServiceConnection == null || !ServiceConnection.IsValid())
             {
+                _log.Infomation("Starting the connection");
                 //if (ServiceConnection == null)
                 //{
-                //    ServiceConnection = new LoopyAppConnection();
+                //    ServiceConnection = new AppConnection();
                 //}
                 ConnectionStatus = (await ServiceConnection.OpenConnectionAsync()).ToString();
             }
@@ -107,30 +127,36 @@ namespace LoopyAppServiceTest
 
         private async void SendPlaybackCommand(LoopyCommand.CommandType command, string param = "")
         {
+
+            _log.Infomation("Opening the connection to the service");
+            
+            if (!ServiceConnection.IsValid())
+            {
+                _log.Error("Failed to connect to the service");
+                return;
+            }
+
             LoopyCommand lc = new LoopyCommand(command, param);
-            if (ServiceConnection.IsValid())
+            try
             {
-                try
+                var messageSet = lc.ToValueSet();
+
+                _log.Infomation($"Sending Value Set {ValueSetOut.ToString(messageSet)}");
+                AppServiceResponse response = await ServiceConnection.SendCommandAsync(messageSet);
+                if (response.Status == AppServiceResponseStatus.Success)
                 {
-                    AppServiceResponse response = await ServiceConnection.SendCommandAsync(lc);
-                    if (response.Status == AppServiceResponseStatus.Success)
-                    {
-                        PlaybackStatus = ValueSetHelper.ValueString(response.Message);
-                    }
-                    else
-                    {
-                        PlaybackStatus = $"Sending Command Failed: {response.Status.ToString()}";
-                    }
+                    PlaybackStatus = ValueSetOut.ToString(response.Message);
                 }
-                catch (Exception ex)
+                else
                 {
-                    PlaybackStatus = ex.Message;
+                    PlaybackStatus = $"Sending Command Failed: {response.Status.ToString()}";
                 }
             }
-            else
+            catch (Exception ex)
             {
-                PlaybackStatus = $"Service Connection is not valid";
+                PlaybackStatus = ex.Message;
             }
+            _log.Infomation($"SendCommand exit with PlaybackStatus: {PlaybackStatus}");
         }
 
         private void Play_Click(object sender, RoutedEventArgs e)

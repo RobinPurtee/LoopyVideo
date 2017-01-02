@@ -10,6 +10,9 @@ namespace LoopyVideo.Commands
  
     internal class LoopyCommand
     {
+        private readonly static string commandName = "Command";
+        private readonly static string paramName = "Param";
+
         public enum CommandType
         {
             Unknown,
@@ -28,30 +31,6 @@ namespace LoopyVideo.Commands
             Param = string.Empty;
         }
 
-        public LoopyCommand(CommandType c, string p)
-        {
-            Command = c;
-            Param = p;
-        }
-
-        public override string ToString()
-        {
-            return $"Command: {Command.ToString()}  Param: {Param}";
-        }
-    }
-
-    internal static class LoopyCommandHelper
-    {
-        private readonly static string commandName = "Command";
-        private readonly static string paramName = "Param";
-
-        public static ValueSet ToValueSet(LoopyCommand lc)
-        {
-            ValueSet ret = new ValueSet();
-            AddToValueSet(lc, ret);
-            return ret;
-        }
-
         public static LoopyCommand FromValueSet(ValueSet values)
         {
             LoopyCommand lc = new LoopyCommand();
@@ -67,17 +46,36 @@ namespace LoopyVideo.Commands
             return lc;
         }
 
-
-        public static void AddToValueSet(LoopyCommand lc, ValueSet set)
+        public LoopyCommand(CommandType c, string p)
         {
-            set.Add(commandName, lc.Command.ToString());
-            if (!string.IsNullOrEmpty(lc.Param))
+            Command = c;
+            Param = p;
+        }
+
+        public ValueSet ToValueSet()
+        {
+            ValueSet ret = new ValueSet();
+            ret.Add(commandName, Command.ToString());
+            if (!string.IsNullOrEmpty(Param))
             {
-                set.Add(paramName, lc.Param);
+                ret.Add(paramName, Param);
+            }
+            return ret;
+        }
+
+        public void AddToValueSet(ref ValueSet set)
+        {
+            set.Add(commandName, Command.ToString());
+            if (!string.IsNullOrEmpty(Param))
+            {
+                set.Add(paramName, Param);
             }
         }
 
+        public override string ToString()
+        {
+            return $"Command: {Command.ToString()}  Param: {Param}";
+        }
     }
-
 
 }
