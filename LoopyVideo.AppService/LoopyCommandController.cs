@@ -23,7 +23,7 @@ namespace LoopyVideo.AppService
             ValueSet commandReturnSet;
             if (AppConnectionFactory.IsValid)
             {
-                Task<AppServiceResponse> sendTask = AppConnectionFactory.Instance.SendCommandAsync(lc).AsTask();
+                Task<AppServiceResponse> sendTask = AppConnectionFactory.Instance.SendCommandAsync(lc.ToValueSet()).AsTask();
                 sendTask.Wait();
                 commandReturnSet = sendTask.Result.Message;
             }

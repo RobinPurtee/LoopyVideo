@@ -37,8 +37,8 @@ namespace LoopyVideo.Commands
         private Logger _log;
 
         private readonly static string _serviceNameDefault = "net.manipulatormanor.LoopyWebServer";
-        //private readonly static string _serviceFamilyNameDefault = "LoopyVideo.AppService-uwp_n1q2psqd6svm2";
-        private readonly static string _serviceFamilyNameDefault = "18c4bd8e-3ea4-4e16-b996-b831b06ab7c9_n1q2psqd6svm2";
+        private readonly static string _serviceFamilyNameDefault = "LoopyVideo.AppService-uwp_n1q2psqd6svm2";
+        //private readonly static string _serviceFamilyNameDefault = "18c4bd8e-3ea4-4e16-b996-b831b06ab7c9_n1q2psqd6svm2";
 
         public delegate ValueSet ReceiveMessage(ValueSet message);
         public event ReceiveMessage MessageReceived;
@@ -220,7 +220,7 @@ namespace LoopyVideo.Commands
             }
             else
             {
-                _log.Infomation("SendCommandAsync: called before the connection is valid");
+                _log.Error("SendCommandAsync: called before the connection is valid");
                 throw new InvalidOperationException("Cannot send a command until connection is opened");
             }
             return ret;

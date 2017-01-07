@@ -23,6 +23,7 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		AppServiceCommands\AppServiceCommands.projitems*{073e3b5d-b511-4088-aa06-5357ad2d6b2c}*SharedItemsImports = 4
 		AppServiceCommands\AppServiceCommands.projitems*{27e084d3-3371-43a6-b6f5-796da78720d8}*SharedItemsImports = 13
+		AppServiceCommands\AppServiceCommands.projitems*{59a8232e-2ba1-4e20-ad24-a02f99ee1ef2}*SharedItemsImports = 4
 		AppServiceCommands\AppServiceCommands.projitems*{602a0125-7211-48ae-907c-0cf636ca2c51}*SharedItemsImports = 4
 		AppServiceCommands\AppServiceCommands.projitems*{ff2ed7c1-c956-454d-a623-d02569eacfef}*SharedItemsImports = 4
 	EndGlobalSection

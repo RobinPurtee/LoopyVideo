@@ -13,67 +13,76 @@ namespace LoopyVideo.AppService
 {
     public sealed class StartupTask : IBackgroundTask
     {
+        private LoopyVideo.Logging.Logger _log = new LoopyVideo.Logging.Logger("WebServiceProvider");
 
-        private BackgroundTaskDeferral _defferral = null;
+        private BackgroundTaskDeferral _deferral = null;
         private HttpServer _webServer = null;
 
 
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
-            Debug.WriteLine($"The packagename is: {Windows.ApplicationModel.Package.Current.Id.FamilyName}");
-            // save the defferal to keep the server running until the instance is Canceled
-            _defferral = taskInstance.GetDeferral();
+            _log.Infomation($"WebService.Run Starting");
+            // save the deferral to keep the server running until the instance is Canceled
+            _deferral = taskInstance.GetDeferral();
             taskInstance.Canceled += Server_Canceled;
 
             // setup the AppService Connection
             var serviceTrigger = taskInstance.TriggerDetails as AppServiceTriggerDetails;
             AppConnectionFactory.Instance.Connection = serviceTrigger.AppServiceConnection;
+            AppConnectionFactory.Instance.MessageReceived += ReceiveAppCommand;
 
-            await AppConnectionFactory.Instance.OpenConnectionAsync();
-            if (AppConnectionFactory.Instance.Status == AppServiceConnectionStatus.Success )
+
+            // setup the web server
+            var restRouteHandler = new RestRouteHandler();
+            restRouteHandler.RegisterController<LoopyCommandController>();
+            var configuration = new HttpServerConfiguration()
+              .ListenOnPort(8800)
+              .RegisterRoute("loopy", restRouteHandler)
+              .EnableCors();
+            try
             {
-                AppConnectionFactory.Instance.MessageReceived += ReceiveAppCommand;
+                _log.Infomation("Creating Web Server");
+                var _webServer = new HttpServer(configuration);
+                await _webServer.StartServerAsync();
+                _log.Infomation("Web Server Task ended");
             }
-
-
-            // setup the the web server
-            //var restRouteHandler = new RestRouteHandler();
-            //restRouteHandler.RegisterController<LoopyCommandController>();
-            //var configuration = new HttpServerConfiguration()
-            //  .ListenOnPort(8800)
-            //  .RegisterRoute("loopy", restRouteHandler)
-            //  .EnableCors();
-            //try
-            //{
-            //    var _webServer = new HttpServer(configuration);
-            //    Task serverTask = Task.Run(_webServer.StartServerAsync);
-            //    serverTask.Wait();
-            //}
-            //catch (Exception ex)
-            //{
-            //    Debug.WriteLine($"Web Server Exception: {ex.Message}");
-            //}
+            catch (Exception ex)
+            {
+                _log.Infomation($"Web Server Exception: {ex.Message}");
+            }
         }
 
         private ValueSet ReceiveAppCommand(ValueSet command)
         {
-            Debug.WriteLine($"Received {command.ToString()} command from the Appication");
+            _log.Infomation($"Received {LoopyVideo.Commands.ValueSetOut.ToString(command)} command from the Appication");
 
             // echo the command back
-            ValueSet retset = command;
-            Debug.WriteLine($"Echo response is: {retset.ToString()}");
+            ValueSet retset = new ValueSet();
+            foreach(var pair in command)
+            {
+                retset.Add(pair);
+            }
+            _log.Infomation($"Echo response is: {LoopyVideo.Commands.ValueSetOut.ToString(retset)}");
             return retset;
         }
 
         private void Server_Canceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
         {
+           
+            _log.Infomation($"Server_Canceled called with reason: {reason.ToString()}");
             if (_webServer != null)
             {
                 _webServer.StopServer();
             }
-            if (_defferral != null)
+            if(AppConnectionFactory.IsValid)
             {
-                _defferral.Complete();
+                AppConnectionFactory.Instance.Dispose();
+            }
+
+            if (_deferral != null)
+            {
+                _log.Infomation($"Server_Canceled: Task complete");
+                _deferral.Complete();
             }
 
         }

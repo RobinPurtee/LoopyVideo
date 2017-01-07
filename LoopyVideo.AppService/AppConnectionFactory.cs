@@ -9,8 +9,8 @@ namespace LoopyVideo.AppService
 {
     internal class AppConnectionFactory
     {
-        private static readonly Lazy<LoopyAppConnection> _instance = new Lazy<LoopyAppConnection>(() => new LoopyAppConnection());
-        internal static LoopyAppConnection Instance
+        private static readonly Lazy<AppConnection> _instance = new Lazy<AppConnection>(() => new AppConnection("WebService.ConnectionFactory"));
+        internal static AppConnection Instance
         {
             get { return _instance.Value; }
         }
