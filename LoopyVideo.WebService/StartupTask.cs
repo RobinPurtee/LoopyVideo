@@ -1,5 +1,8 @@
 ﻿using System;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Net.Http;
 using Windows.ApplicationModel.Background;
 using Windows.ApplicationModel.AppService;
 using Windows.Foundation.Collections;
@@ -7,12 +10,11 @@ using Restup.Webserver.Http;
 using Restup.Webserver.Rest;
 using Restup.Webserver.File;
 
+// The Background Application template is documented at http://go.microsoft.com/fwlink/?LinkID=533884&clcid=0x409
 
-
-
-namespace LoopyVideo.WebServiceComponent
+namespace LoopyVideo.WebService
 {
-    public sealed class WebService : IBackgroundTask
+    public sealed class StartupTask : IBackgroundTask
     {
         private LoopyVideo.Logging.Logger _log = new LoopyVideo.Logging.Logger("WebServiceProvider");
 
@@ -63,7 +65,7 @@ namespace LoopyVideo.WebServiceComponent
 
             // echo the command back
             ValueSet retset = new ValueSet();
-            foreach(var pair in command)
+            foreach (var pair in command)
             {
                 retset.Add(pair);
             }
@@ -73,13 +75,13 @@ namespace LoopyVideo.WebServiceComponent
 
         private void Server_Canceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
         {
-           
+
             _log.Infomation($"Server_Canceled called with reason: {reason.ToString()}");
             if (_webServer != null)
             {
                 _webServer.StopServer();
             }
-            if(AppConnectionFactory.IsValid)
+            if (AppConnectionFactory.IsValid)
             {
                 AppConnectionFactory.Instance.Dispose();
             }
