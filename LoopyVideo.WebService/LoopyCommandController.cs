@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Restup.Webserver.Rest;
 using Restup.Webserver.Attributes;
 using Restup.Webserver.Models.Contracts;
 using Restup.Webserver.Models.Schemas;
@@ -23,9 +19,9 @@ namespace LoopyVideo.WebService
             ValueSet commandReturnSet;
             if (AppConnectionFactory.IsValid)
             {
-                //Task<AppServiceResponse> sendTask = AppConnectionFactory.Instance.SendCommandAsync(lc).AsTask();
-                //sendTask.Wait();
-                //commandReturnSet = sendTask.Result.Message;
+                Task<AppServiceResponse> sendTask = AppConnectionFactory.Instance.SendCommandAsync(lc.ToValueSet()).AsTask();
+                sendTask.Wait();
+                commandReturnSet = sendTask.Result.Message;
             }
 
             var response = new GetResponse(GetResponse.ResponseStatus.OK, lc);
