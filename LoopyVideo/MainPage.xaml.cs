@@ -189,7 +189,7 @@ namespace LoopyVideo
             catch(Exception ex)
             {
                 MessageDialog dialog = new MessageDialog(ex.Message);
-                dialog.ShowAsync();
+                await dialog.ShowAsync();
             }
 
         }
@@ -273,7 +273,7 @@ namespace LoopyVideo
             string errorName = string.Format("MediaPlayerError_{0}", args.Error.ToString());
             try
             {
-                var ignored = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, () => {
+                var ignored = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () => {
                     string errorMessage; 
                     //errorMessage = (string)Application.Current.Resources[errorName];
                     var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
@@ -281,7 +281,7 @@ namespace LoopyVideo
 
                     Debug.WriteLine("The media source has failed : " + errorMessage);
                     MessageDialog dialog = new MessageDialog(errorMessage);
-                    dialog.ShowAsync();
+                    await dialog.ShowAsync();
 
                 });
             }

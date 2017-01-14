@@ -12,5 +12,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LoopyAppConnection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LoopyCommand.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)WebServerManager.cs" />
   </ItemGroup>
 </Project>

@@ -38,7 +38,7 @@ namespace LoopyVideo
 
         }
 
-        public async void Register()
+        public void Register()
         {
             if(!IsRegistered)
             {

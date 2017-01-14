@@ -1,28 +1,21 @@
 ﻿<Page
-    x:Class="WebAppServiceClient.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WebAppServiceClient"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Controls="using:WebAppServiceClient.Controls"
+    x:Class="WebAppServiceClient.MainPage"
     mc:Ignorable="d">
-    <Page.Resources>
-    </Page.Resources>
 
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Width="1024" Height="1024">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"  />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto"/>
-        </Grid.ColumnDefinitions>
-        <TextBlock Grid.Row="0" Text="Play Command Recieved" Margin="8" />
-        <TextBlock Grid.Row="1" Text="Stop Command Recieved" Margin="8"/>
-        <Ellipse Grid.Row="0" Grid.Column="1" Fill="Red" Height="25" Width="25" Stroke="Black" />
-        <Ellipse Grid.Row="1" Grid.Column="1" Fill="Red" Height="25" Width="25" Stroke="Black" />
-        <ToggleButton x:Name="toggleButton" Content="ToggleButton" Grid.Column="1" HorizontalAlignment="Left" Margin="147,26,-122,0" Grid.Row="1" VerticalAlignment="Top"/>
+    <StackPanel Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
 
-    </Grid>
+        <Controls:IndicatorControl x:Name="PlayIndicator" Label="Play Command Recieved" HorizontalAlignment="Center" />
+        <Controls:IndicatorControl x:Name="StopIndicator" Label="Stop Command Recieved" HorizontalAlignment="Center" />
+        <StackPanel Orientation="Horizontal" Padding="0" HorizontalAlignment="Center">
+            <Button x:Name="PlayButton" Content="Play" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="8" Click="PlayButton_Click"/>
+            <Button x:Name="StopButton" Content="Stop" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="8" Click="StopButton_Click"/>
+        </StackPanel>
+
+    </StackPanel>
 </Page>

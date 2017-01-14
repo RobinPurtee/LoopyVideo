@@ -10,27 +10,40 @@
     d:DesignWidth="100">
     <UserControl.Resources>
         <Color x:Key="LightOnColor">Green</Color>
-        <SolidColorBrush x:Key="LightOffColor">Red</SolidColorBrush>
+        <Color x:Key="LightOffColor">Red</Color>
+        <Color x:Key="LightBorderColor">Black</Color>
+        <SolidColorBrush x:Key="LightOnBrush" Color="{StaticResource LightOnColor}"/>
+        <SolidColorBrush x:Key="LightOffBrush" Color="{StaticResource LightOffColor}"/>
+        <SolidColorBrush x:Key="LightBorderBrush" Color="{StaticResource LightBorderColor}"/>
+
         <Style TargetType="Ellipse">
-            <Setter Property="Stroke" Value="Black"/>
-            
-            <Setter Property="Fill" Value="{StaticResource LightOffColor}"/>
+            <Setter Property="Stroke" Value="{StaticResource LightBorderBrush}"/>
+            <Setter Property="Fill" Value="{StaticResource LightOffBrush}"/>
         </Style>
     </UserControl.Resources>
 
-    <StackPanel Orientation="Horizontal">
+    <RelativePanel Margin="0,2,0,-2" >
         <VisualStateManager.VisualStateGroups>
             <VisualStateGroup x:Name="VisualStateGroup">
-                <VisualState x:Name="On"/>
+                <VisualState x:Name="LightOn">
+                    <VisualState.Setters>
+                        <Setter Target="Light.(Shape.Fill)" Value="{StaticResource LightOnBrush}"/>
+                        <Setter Target="Light.(Shape.Stroke)" Value="{StaticResource LightBorderBrush}"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="LightOff">
+                    <VisualState.Setters>
+                        <Setter Target="Light.(Shape.Fill)" Value="{StaticResource LightOffBrush}"/>
+                        <Setter Target="Light.(Shape.Stroke)" Value="{StaticResource LightBorderBrush}"></Setter>
+                    </VisualState.Setters>
+                    <Storyboard>
+                        <ColorAnimation Duration="0" To="Gray" Storyboard.TargetProperty="(Shape.Stroke).(SolidColorBrush.Color)" Storyboard.TargetName="Light" d:IsOptimized="True"/>
+                    </Storyboard>
+                </VisualState>
             </VisualStateGroup>
         </VisualStateManager.VisualStateGroups>
-        <TextBlock x:Name="textBlock" Text="{Binding Path=Label}"/>
-        <Ellipse  
-            Width="{Binding Height, ElementName=textBlock}" 
-            Height="{Binding Height, ElementName=textBlock}"
-            >
-        </Ellipse>
+        <TextBlock x:Name="textBlock" Text="{x:Bind Path=Label}" Margin="8" RelativePanel.AlignVerticalCenterWithPanel="True" Foreground="{ThemeResource TextControlForeground}"/>
+        <Ellipse x:Name="Light" RelativePanel.RightOf="textBlock" Width="{Binding ActualHeight, ElementName=textBlock}" Height="{Binding ActualHeight, ElementName=textBlock}" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,8,8,8" Fill="{StaticResource LightOffBrush}"/>
 
-
-    </StackPanel>
+    </RelativePanel>
 </UserControl>

@@ -12,7 +12,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
+using WebAppServiceClient.Controls;
 // The Blank Page item template is documented at http://go.microsoft.com/fwlink/?LinkId=402352&clcid=0x409
 
 namespace WebAppServiceClient
@@ -25,6 +25,31 @@ namespace WebAppServiceClient
         public MainPage()
         {
             this.InitializeComponent();
+        }
+
+        private void PlayButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(PlayIndicator.Indicator == IndicatorControl.State.Off)
+            {
+                PlayIndicator.Indicator = IndicatorControl.State.On;
+            }
+            else
+            {
+                PlayIndicator.Indicator = IndicatorControl.State.Off;
+            }
+
+        }
+
+        private void StopButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (StopIndicator.Indicator == IndicatorControl.State.Off)
+            {
+                StopIndicator.Indicator = IndicatorControl.State.On;
+            }
+            else
+            {
+                StopIndicator.Indicator = IndicatorControl.State.Off;
+            }
         }
     }
 }
