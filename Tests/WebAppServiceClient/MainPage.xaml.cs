@@ -51,5 +51,10 @@ namespace WebAppServiceClient
                 StopIndicator.Indicator = IndicatorControl.State.Off;
             }
         }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

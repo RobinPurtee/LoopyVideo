@@ -1,6 +1,7 @@
 ﻿using System;
 using Xunit;
 using LoopyVideo.Commands;
+using LoopyVideo.Logging;
 using Windows.ApplicationModel.AppService;
 using Windows.Foundation.Collections;
 

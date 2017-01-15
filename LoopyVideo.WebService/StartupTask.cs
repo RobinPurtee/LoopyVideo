@@ -55,7 +55,7 @@ namespace LoopyVideo.WebService
 
         private ValueSet ReceiveAppCommand(ValueSet command)
         {
-            _log.Infomation($"Received {LoopyVideo.Commands.ValueSetOut.ToString(command)} command from the Appication");
+            _log.Infomation($"Received {LoopyVideo.Logging.ValueSetOut.ToString(command)} command from the Appication");
 
             //isBusy = command["Command"].ToString() != "Exit";
 
@@ -66,7 +66,7 @@ namespace LoopyVideo.WebService
             {
                 retset.Add(pair);
             }
-            _log.Infomation($"Echo response is: {LoopyVideo.Commands.ValueSetOut.ToString(retset)}");
+            _log.Infomation($"Echo response is: {LoopyVideo.Logging.ValueSetOut.ToString(retset)}");
             return retset;
         }
 

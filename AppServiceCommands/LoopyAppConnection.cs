@@ -8,27 +8,9 @@ using Windows.ApplicationModel.AppService;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using LoopyVideo.Logging;
+
 namespace LoopyVideo.Commands
 {
-
-    internal static class ValueSetOut
-    {
-        public static string ToString(ValueSet values)
-        {
-            StringBuilder valueBuilder = new StringBuilder();
-            foreach(var pair in values)
-            {
-                if(valueBuilder.Length > 0)
-                {
-                    valueBuilder.Append(" | ");
-                }
-                valueBuilder.Append($"Key: {pair.Key} Value: {pair.Value}");
-            }
-
-            return valueBuilder.ToString();
-        }
-    }
-
     /// <summary>
     /// The connection between LoopyVideo.AppService and  the apps being serviced
     /// </summary>

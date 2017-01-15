@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using Windows.Foundation.Diagnostics;
+using Windows.Foundation.Collections;
 
 namespace LoopyVideo.Logging
 {
@@ -73,4 +73,24 @@ namespace LoopyVideo.Logging
             _logChannel.LogMessage(message, LoggingLevel.Error);
         }
     }
+
+    internal static class ValueSetOut
+    {
+        public static string ToString(ValueSet values)
+        {
+            StringBuilder valueBuilder = new StringBuilder();
+            foreach (var pair in values)
+            {
+                if (valueBuilder.Length > 0)
+                {
+                    valueBuilder.Append(" | ");
+                }
+                valueBuilder.Append($"Key: {pair.Key} Value: {pair.Value}");
+            }
+
+            return valueBuilder.ToString();
+        }
+    }
+
+
 }
