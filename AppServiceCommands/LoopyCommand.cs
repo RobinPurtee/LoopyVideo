@@ -28,12 +28,18 @@ namespace LoopyVideo.Commands
 
         public LoopyCommand() : this(CommandType.Unknown, ""){ }
         public LoopyCommand(CommandType c) : this(c, "") { }
+        public LoopyCommand(LoopyCommand lc) : this(lc.Command, lc.Param) { }
         public LoopyCommand(CommandType c, string p)
         {
             Command = c;
             Param = p;
         }
 
+        public void Copy(LoopyCommand lc)
+        {
+            Command = lc.Command;
+            Param = lc.Param;
+        }
         public static LoopyCommand FromValueSet(ValueSet values)
         {
             LoopyCommand lc = new LoopyCommand();

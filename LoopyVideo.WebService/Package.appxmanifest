@@ -21,11 +21,6 @@
         <uap:SplashScreen Image="Assets\SplashScreen.png" />
       </uap:VisualElements>
       <Extensions>
-        <Extension Category="windows.backgroundTasks" EntryPoint="LoopyVideo.WebService.StartupTask">
-          <BackgroundTasks>
-            <iot:Task Type="startup" />
-          </BackgroundTasks>
-        </Extension>
         <uap:Extension Category="windows.appService" EntryPoint="LoopyVideo.WebService.StartupTask">
           <uap:AppService Name="net.manipulatormanor.LoopyWebServer" />
         </uap:Extension>

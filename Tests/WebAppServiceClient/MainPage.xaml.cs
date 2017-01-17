@@ -1,4 +1,5 @@
-﻿using Windows.UI.Xaml;
+﻿using Windows.UI.Core;
+using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.Foundation.Collections;
 using WebAppServiceClient.Controls;
@@ -42,24 +43,26 @@ namespace WebAppServiceClient
         private LoopyCommand CommandReceived(LoopyCommand command)
         {
             _log.Infomation($"Command received: {command.ToString()}");
-            LoopyCommand retCommand = new LoopyCommand();
-            switch(command.Command)
+            LoopyCommand retCommand = new LoopyCommand(LoopyCommand.CommandType.Error, $"Unsupported command type {command.Command.ToString()}");
+            Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
-                case LoopyCommand.CommandType.Play:
-                    TogglePlayState();
-                    retCommand.Command = LoopyCommand.CommandType.Play;
-                    break;
-                case LoopyCommand.CommandType.Stop:
-                    ToggleStopState();
-                    retCommand.Command = LoopyCommand.CommandType.Stop;
-                    break;
-                default:
-                    retCommand.Command = LoopyCommand.CommandType.Error;
-                    retCommand.Param = $"Unsupported command type {command.Command.ToString()}";
-                    break;
+                switch (command.Command)
+                {
+                    case LoopyCommand.CommandType.Play:
+                        TogglePlayState();
+                        retCommand.Copy(command);
+                        break;
+                    case LoopyCommand.CommandType.Stop:
+                        ToggleStopState();
+                        retCommand.Copy(command);
+                        break;
+                    default:
+                        break;
 
-            }
+                }
+            }).AsTask().Wait();
             return retCommand;
+
         }
 
         public MainPage()
@@ -70,6 +73,7 @@ namespace WebAppServiceClient
 
         private void TogglePlayState()
         {
+
             PlayIndicator.Indicator = (PlayIndicator.Indicator == IndicatorControl.State.Off) 
                 ? IndicatorControl.State.On
                 : IndicatorControl.State.Off;
