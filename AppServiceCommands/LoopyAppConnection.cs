@@ -19,10 +19,14 @@ namespace LoopyVideo.Commands
         private Logger _log;
 
         private readonly static string _serviceNameDefault = "net.manipulatormanor.LoopyWebServer";
-        private readonly static string _serviceFamilyNameDefault = "LoopyVideo.AppService-uwp_n1q2psqd6svm2";
-        //private readonly static string _serviceFamilyNameDefault = "18c4bd8e-3ea4-4e16-b996-b831b06ab7c9_n1q2psqd6svm2";
+        private readonly static string _serviceFamilyNameDefault = "LoopyVideo.WebService-uwp_n1q2psqd6svm2";
 
-        public delegate ValueSet ReceiveMessage(ValueSet message);
+        /// <summary>
+        /// Message Recieved event handler
+        /// </summary>
+        /// <param name="command">The command recieved</param>
+        /// <returns>The current status </returns>
+        public delegate LoopyCommand ReceiveMessage(LoopyCommand command);
         public event ReceiveMessage MessageReceived;
 
 
@@ -191,21 +195,40 @@ namespace LoopyVideo.Commands
         /// Send a Command message to the head applicaiton
         /// </summary>
         /// <param name="command">The command to send</param>
-        /// <returns>The ValueSet containing the response</returns>
-        public IAsyncOperation<AppServiceResponse> SendCommandAsync(ValueSet command)
+        /// <returns>The LoopyCommand containing the response</returns>
+        public IAsyncOperation<LoopyCommand> SendCommandAsync(LoopyCommand command)
         {
-            IAsyncOperation<AppServiceResponse> ret = null;
-            if (IsValid())
-            {
-                _log.Infomation($"SendCommandAsync: Sending {ValueSetOut.ToString(command)}");
-                ret = Connection.SendMessageAsync(command);
-            }
-            else
-            {
-                _log.Error("SendCommandAsync: called before the connection is valid");
-                throw new InvalidOperationException("Cannot send a command until connection is opened");
-            }
-            return ret;
+
+            return Task<LoopyCommand>.Run(async () =>
+           {
+               AppServiceResponse response = null;
+               LoopyCommand retCommand;
+               if (IsValid())
+               {
+                   _log.Infomation($"SendCommandAsync: Sending {command.ToString()}");
+                   response = await Connection.SendMessageAsync(command.ToValueSet());
+                   if(response.Status != AppServiceResponseStatus.Success)
+                   {
+                       retCommand = new LoopyCommand(
+                                                    LoopyCommand.CommandType.Error,
+                                                    $"Command response status: {response.Status} with message: {ValueSetOut.ToString(response.Message)}"
+                                                    );
+                       _log.Error(retCommand.Param.ToString());  
+                   }
+                   else
+                   {
+                       retCommand = LoopyCommand.FromValueSet(response.Message);
+                   }
+
+               }
+               else
+               {
+                   _log.Error("SendCommandAsync: called before the connection is valid");
+                   throw new InvalidOperationException("Cannot send a command until connection is opened");
+               }
+               return retCommand;
+           }
+            ).AsAsyncOperation<LoopyCommand>();
         }
 
 
@@ -229,7 +252,10 @@ namespace LoopyVideo.Commands
                 AppServiceResponseStatus status = AppServiceResponseStatus.Unknown;
                 if (MessageReceived != null)
                 {
-                    status = await args.Request.SendResponseAsync(MessageReceived(args.Request.Message));
+                    LoopyCommand lc = LoopyCommand.FromValueSet(args.Request.Message);
+                    LoopyCommand result = MessageReceived(lc);
+                    _log.Infomation($"AppConnection.RequestRecieved: response: {result.ToString()}");
+                    status = await args.Request.SendResponseAsync(result.ToValueSet());
                 }
 
                 _log.Infomation($"Sending Response to Request returned: {status.ToString()}");

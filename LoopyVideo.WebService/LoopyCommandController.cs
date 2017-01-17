@@ -15,27 +15,27 @@ namespace LoopyVideo.WebService
     {
         private IGetResponse SendAppCommand(LoopyCommand.CommandType command, string param = "")
         {
-            LoopyCommand lc = new LoopyCommand(command, string.Empty);
-            ValueSet commandReturnSet;
+            LoopyCommand lc = new LoopyCommand(command, param);
+            LoopyCommand retCommand = new LoopyCommand(LoopyCommand.CommandType.Error, "AppConnection is invalid");
             if (AppConnectionFactory.IsValid)
             {
-                Task<AppServiceResponse> sendTask = AppConnectionFactory.Instance.SendCommandAsync(lc.ToValueSet()).AsTask();
+                Task<LoopyCommand> sendTask = AppConnectionFactory.Instance.SendCommandAsync(lc).AsTask();
                 sendTask.Wait();
-                commandReturnSet = sendTask.Result.Message;
+                retCommand = sendTask.Result;
             }
 
-            var response = new GetResponse(GetResponse.ResponseStatus.OK, lc);
+            var response = new GetResponse(GetResponse.ResponseStatus.OK, retCommand);
             Debug.WriteLine("Command responding with: {0}", response);
             return response;
         }
 
-        [UriFormat("/Play")]
+        [UriFormat("/play")]
         public IGetResponse PlayCommand()
         {
             return SendAppCommand(LoopyCommand.CommandType.Play);
         }
 
-        [UriFormat("/Stop")]
+        [UriFormat("/stop")]
         public IGetResponse StopCommand()
         {
             return SendAppCommand(LoopyCommand.CommandType.Stop);

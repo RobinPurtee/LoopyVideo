@@ -4,10 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Windows.Foundation.Collections;
+using Windows.UI.Xaml.Data;
 
 namespace LoopyVideo.Commands
 {
- 
     internal class LoopyCommand
     {
         private readonly static string commandName = "Command";
@@ -16,6 +16,7 @@ namespace LoopyVideo.Commands
         public enum CommandType
         {
             Unknown,
+            Error,
             Play,
             Stop,
             Media
@@ -25,10 +26,12 @@ namespace LoopyVideo.Commands
         public CommandType Command { get; set; }
         public string Param { get; set; }
 
-        public LoopyCommand()
+        public LoopyCommand() : this(CommandType.Unknown, ""){ }
+        public LoopyCommand(CommandType c) : this(c, "") { }
+        public LoopyCommand(CommandType c, string p)
         {
-            Command = CommandType.Unknown;
-            Param = string.Empty;
+            Command = c;
+            Param = p;
         }
 
         public static LoopyCommand FromValueSet(ValueSet values)
@@ -46,12 +49,7 @@ namespace LoopyVideo.Commands
             return lc;
         }
 
-        public LoopyCommand(CommandType c, string p)
-        {
-            Command = c;
-            Param = p;
-        }
-
+ 
         public ValueSet ToValueSet()
         {
             ValueSet ret = new ValueSet();

@@ -67,16 +67,11 @@ namespace LoopyAppServiceTest
             }
         }
 
-        private ValueSet CommandReceived(ValueSet set)
+        private LoopyCommand CommandReceived(LoopyCommand command)
         {
-            _log.Infomation($"Command received: {set.ToString()}");
-            ValueSet retset = new ValueSet();
-            foreach(var pair in set)
-            {
-                retset.Add(pair);
-            }
-
-            return set;
+            _log.Infomation($"Command received: {command.ToString()}");
+            // TODO: implement state container
+            return command;
         }
 
         public MainPage()
@@ -128,18 +123,10 @@ namespace LoopyAppServiceTest
             LoopyCommand lc = new LoopyCommand(command, param);
             try
             {
-                var messageSet = lc.ToValueSet();
-
-                _log.Infomation($"Sending Value Set {ValueSetOut.ToString(messageSet)}");
-                AppServiceResponse response = await ServiceConnection.SendCommandAsync(messageSet);
-                if (response.Status == AppServiceResponseStatus.Success)
-                {
-                    PlaybackStatus = ValueSetOut.ToString(response.Message);
-                }
-                else
-                {
-                    PlaybackStatus = $"Sending Command Failed: {response.Status.ToString()}";
-                }
+            
+                _log.Infomation($"Sending Command {lc.ToString()}");
+                LoopyCommand response = await ServiceConnection.SendCommandAsync(lc);
+                PlaybackStatus = response.ToString();
             }
             catch (Exception ex)
             {

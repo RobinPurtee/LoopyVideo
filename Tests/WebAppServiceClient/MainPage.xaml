@@ -17,6 +17,14 @@
             <Button x:Name="PlayButton" Content="Play" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="8" Click="PlayButton_Click"/>
             <Button x:Name="StopButton" Content="Stop" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="8" Click="StopButton_Click"/>
         </StackPanel>
+        <TextBlock  TextWrapping="Wrap">
+            <Run Text="Status: "/>
+            <Run x:Name="statusText"/>
+        </TextBlock>
+        <TextBlock  TextWrapping="Wrap">
+            <Run Text="Error: "/>
+            <Run x:Name="errorText"/>
+        </TextBlock>
 
     </StackPanel>
 </Page>
