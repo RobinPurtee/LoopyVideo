@@ -95,7 +95,7 @@ namespace LoopyVideo.Commands
 
         public bool IsValid()
         {
-            _log.Infomation($"AppConnection.IsValid: {((null != Connection) ? "is Connected" : "is Not connected}")} and Status : {Status.ToString()}");
+            _log.Information($"AppConnection.IsValid: {((null != Connection) ? "is Connected" : "is Not connected}")} and Status : {Status.ToString()}");
             return (null != Connection) && (Status == AppServiceConnectionStatus.Success);
         }
 
@@ -167,10 +167,10 @@ namespace LoopyVideo.Commands
 
         public IAsyncOperation<AppServiceConnectionStatus> OpenConnectionAsync()
         {
-            _log.Infomation("OpenConnectionAsync: called");
+            _log.Information("OpenConnectionAsync: called");
             return Task<AppServiceConnectionStatus>.Run(async () =>
             {
-                _log.Infomation("OpenConnectionAsync: Creating App Service Connection");
+                _log.Information("OpenConnectionAsync: Creating App Service Connection");
                 AppServiceConnection connection = new AppServiceConnection();
 
                 // Here, we use the app service name defined in the app service provider's Package.appxmanifest file in the <Extension> section.
@@ -181,7 +181,7 @@ namespace LoopyVideo.Commands
 
                 Status = await connection.OpenAsync();
                 bool bRet = Status == AppServiceConnectionStatus.Success;
-                _log.Infomation($"OpenConnectionAsync: Connection Status = {Status.ToString()}");
+                _log.Information($"OpenConnectionAsync: Connection Status = {Status.ToString()}");
 
                 if (bRet)
                 {
@@ -205,7 +205,7 @@ namespace LoopyVideo.Commands
                LoopyCommand retCommand;
                if (IsValid())
                {
-                   _log.Infomation($"SendCommandAsync: Sending {command.ToString()}");
+                   _log.Information($"SendCommandAsync: Sending {command.ToString()}");
                    response = await Connection.SendMessageAsync(command.ToValueSet());
                    if(response.Status != AppServiceResponseStatus.Success)
                    {
@@ -241,24 +241,24 @@ namespace LoopyVideo.Commands
         {
             if(!IsValid())
             {
-                _log.Infomation("SendCommandAsync: called before the connection is valid");
+                _log.Information("SendCommandAsync: called before the connection is valid");
                 throw new InvalidOperationException("Message recieved before connection is opened");
             }
             var requestDefferal = args.GetDeferral();
             try
             {
 
-                _log.Infomation($"AppConnection.RequestReceived: received the following message: {ValueSetOut.ToString(args.Request.Message)}");
+                _log.Information($"AppConnection.RequestReceived: received the following message: {ValueSetOut.ToString(args.Request.Message)}");
                 AppServiceResponseStatus status = AppServiceResponseStatus.Unknown;
                 if (MessageReceived != null)
                 {
                     LoopyCommand lc = LoopyCommand.FromValueSet(args.Request.Message);
                     LoopyCommand result = MessageReceived(lc);
-                    _log.Infomation($"AppConnection.RequestRecieved: response: {result.ToString()}");
+                    _log.Information($"AppConnection.RequestRecieved: response: {result.ToString()}");
                     status = await args.Request.SendResponseAsync(result.ToValueSet());
                 }
 
-                _log.Infomation($"Sending Response to Request returned: {status.ToString()}");
+                _log.Information($"Sending Response to Request returned: {status.ToString()}");
             }
             finally
             {
@@ -268,7 +268,7 @@ namespace LoopyVideo.Commands
 
         private void ServiceClosed(AppServiceConnection sender, AppServiceClosedEventArgs args)
         {
-            _log.Infomation($"AppService Connection has be closed by: {args.Status.ToString()}");
+            _log.Information($"AppService Connection has be closed by: {args.Status.ToString()}");
             Connection = null;
             Status = AppServiceConnectionStatus.Unknown;
         }

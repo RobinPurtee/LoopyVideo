@@ -19,7 +19,6 @@ namespace WebAppServiceClient
         private Logger _log = new Logger("WebAppServiceClient");
 
         private AppConnection _serviceConnection;
-
         private AppConnection ServiceConnection
         {
             get { return _serviceConnection; }
@@ -27,14 +26,14 @@ namespace WebAppServiceClient
             {
                 if (_serviceConnection != null)
                 {
-                    _log.Infomation("Disposing of old connection");
+                    _log.Information("Disposing of old connection");
                     _serviceConnection.MessageReceived -= CommandReceived;
                     _serviceConnection.Dispose();
                 }
                 _serviceConnection = value;
                 if (_serviceConnection != null)
                 {
-                    _log.Infomation("new connection set");
+                    _log.Information("new connection set");
                     _serviceConnection.MessageReceived += CommandReceived;
                 }
             }
@@ -42,7 +41,7 @@ namespace WebAppServiceClient
 
         private LoopyCommand CommandReceived(LoopyCommand command)
         {
-            _log.Infomation($"Command received: {command.ToString()}");
+            _log.Information($"Command received: {command.ToString()}");
             LoopyCommand retCommand = new LoopyCommand(LoopyCommand.CommandType.Error, $"Unsupported command type {command.Command.ToString()}");
             Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
@@ -102,7 +101,7 @@ namespace WebAppServiceClient
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            _log.Infomation("MainPage Loaded");
+            _log.Information("MainPage Loaded");
             DataContext = this;
             if (ServiceConnection == null)
             {
@@ -117,7 +116,7 @@ namespace WebAppServiceClient
         private async void SendPlaybackCommand(LoopyCommand.CommandType command, string param = "")
         {
 
-            _log.Infomation("Opening the connection to the service");
+            _log.Information("Opening the connection to the service");
 
             if (!ServiceConnection.IsValid())
             {
@@ -130,7 +129,7 @@ namespace WebAppServiceClient
             try
             {
 
-                _log.Infomation($"Sending Command {lc.ToString()}");
+                _log.Information($"Sending Command {lc.ToString()}");
                 LoopyCommand response = await ServiceConnection.SendCommandAsync(lc);
                 statusText.Text = response.ToString();
             }
@@ -138,7 +137,7 @@ namespace WebAppServiceClient
             {
                 errorText.Text = $"Exception while Sending Play command: {ex.Message}";
             }
-            _log.Infomation($"SendCommand exit with PlaybackStatus: {statusText.Text}");
+            _log.Information($"SendCommand exit with PlaybackStatus: {statusText.Text}");
         }
 
     }

@@ -63,7 +63,7 @@ namespace LoopyVideo.Logging
         #endregion
 
 
-        public void Infomation(string message)
+        public void Information(string message)
         {
             _logChannel.LogMessage(message, LoggingLevel.Information);
         }

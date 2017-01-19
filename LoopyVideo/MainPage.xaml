@@ -9,7 +9,7 @@
     mc:Ignorable="d"
     Loaded="Page_Loaded"
     Unloaded="Page_Unloaded" 
-    Width="720" Height="512"
+    Width="720" Padding="0" 
     >
     <!--Source="{x:Bind mediacore:MediaSource.CreateFromUri(rootPage.CaptionedMediaUri)}"-->
     <Page.Resources>
@@ -23,7 +23,7 @@
                             Width="640" Height="480"
                             AreTransportControlsEnabled="False"/>
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="Video Uri:"/>
+            <TextBlock Text="Video Uri:" VerticalAlignment="Center" Margin="0,0,4,0"/>
             <TextBox Text="{x:Bind MediaUri,Mode=TwoWay,Converter={StaticResource TwoWayUriConverter}}" Width="300"/>
             <Button x:Name="filePick" Content="..." Margin="3" Click="filePick_Click"/>
             <Button x:Name="SetUriButton" Content="Load" Click="SetUriButton_Click" Margin="3"/>

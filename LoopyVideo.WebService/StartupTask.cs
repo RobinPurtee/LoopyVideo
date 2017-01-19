@@ -22,7 +22,7 @@ namespace LoopyVideo.WebService
 
         public async void Run(IBackgroundTaskInstance taskInstance)
         {
-            _log.Infomation($"WebService.Run Starting");
+            _log.Information($"WebService.Run Starting");
             // save the deferral to keep the server running until the instance is Canceled
             _deferral = taskInstance.GetDeferral();
             taskInstance.Canceled += Server_Canceled;
@@ -51,21 +51,21 @@ namespace LoopyVideo.WebService
                   .EnableCors();
                 try
                 {
-                    _log.Infomation("Creating Web Server");
+                    _log.Information("Creating Web Server");
                     _webServer = new HttpServer(configuration);
                     await _webServer.StartServerAsync();
-                    _log.Infomation("Web Server Task ended");
+                    _log.Information("Web Server Task ended");
                 }
                 catch (Exception ex)
                 {
-                    _log.Infomation($"Web Server Exception: {ex.Message}");
+                    _log.Information($"Web Server Exception: {ex.Message}");
                 }
             }
         }
 
         private LoopyCommand ReceiveAppCommand(LoopyCommand command)
         {
-            _log.Infomation($"Received {command.ToString()} command from the Appication");
+            _log.Information($"Received {command.ToString()} command from the Appication");
 
             // echo the command back
 
@@ -76,7 +76,7 @@ namespace LoopyVideo.WebService
         private void Server_Canceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
         {
 
-            _log.Infomation($"Server_Canceled called with reason: {reason.ToString()}");
+            _log.Information($"Server_Canceled called with reason: {reason.ToString()}");
             if (_webServer != null)
             {
                 _webServer.StopServer();
@@ -88,7 +88,7 @@ namespace LoopyVideo.WebService
 
             if (_deferral != null)
             {
-                _log.Infomation($"Server_Canceled: Task complete");
+                _log.Information($"Server_Canceled: Task complete");
                 _deferral.Complete();
             }
 

@@ -135,7 +135,7 @@ namespace LoopyVideo
 
         private void OnServerExit(IBackgroundTaskRegistration sender, BackgroundTaskCompletedEventArgs args)
         {
-            _log.Infomation("Backgroud service exited ");
+            _log.Information("Backgroud service exited ");
             if (_registered)
             {
                 _server.Unregister(false);

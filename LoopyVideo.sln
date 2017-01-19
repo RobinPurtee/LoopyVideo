@@ -23,6 +23,7 @@ Global
 		AppServiceCommands\AppServiceCommands.projitems*{1e093076-bf2f-4103-a378-2b7a625a88d8}*SharedItemsImports = 4
 		AppServiceCommands\AppServiceCommands.projitems*{27e084d3-3371-43a6-b6f5-796da78720d8}*SharedItemsImports = 13
 		AppServiceCommands\AppServiceCommands.projitems*{464a0ce9-31aa-45c7-9b27-b75b9de5a8f9}*SharedItemsImports = 4
+		AppServiceCommands\AppServiceCommands.projitems*{c72f9420-c90a-4903-99d7-3c7b3ca899f3}*SharedItemsImports = 4
 		AppServiceCommands\AppServiceCommands.projitems*{ff2ed7c1-c956-454d-a623-d02569eacfef}*SharedItemsImports = 4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
