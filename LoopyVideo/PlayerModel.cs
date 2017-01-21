@@ -58,8 +58,8 @@ namespace LoopyVideo
         /// </summary>
         public Uri MediaUri
         {
-            get;
-            set;
+            get { return MediaSourceUri.Instance.Get(); }
+            set { MediaSourceUri.Instance.Set(value); }
         }
 
         /// <summary>
@@ -97,16 +97,11 @@ namespace LoopyVideo
         public PlayerModel(MediaPlayer player, Uri mediaLocation)
         {
             Player = player;
+            MediaSourceUri.Instance.PropertyChanged += UriPropertyChanged;
             if (mediaLocation != null)
             {
                 MediaUri = mediaLocation;
             }
-            else
-            {
-                MediaUri = MediaSourceUri.Instance.Get();
-            }
-            MediaSourceUri.Instance.PropertyChanged += UriPropertyChanged;
-            UpdateMediaSource();      
         }
 
         /// <summary>
@@ -182,7 +177,7 @@ namespace LoopyVideo
         {
             if (e.PropertyName == MediaSourceUri.MediaUriName)
             {
-                MediaUri = MediaSourceUri.Instance.Get();
+                //MediaUri = MediaSourceUri.Instance.Get();
                 UpdateMediaSource();
             }
         }

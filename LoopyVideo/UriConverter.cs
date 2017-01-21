@@ -16,7 +16,7 @@ namespace LoopyVideo
                 Uri uri = value as Uri;
                 if(null != uri)
                 {
-                    ret = uri.AbsoluteUri;
+                    ret = uri.ToString();
                 }
             }
             return ret;

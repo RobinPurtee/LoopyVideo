@@ -22,10 +22,10 @@ namespace AppServiceUnitTest
                 LoopyCommand lc = new LoopyCommand(LoopyCommand.CommandType.Play, null);
                 Assert.True(connection.IsValid(), "The appliccation connection is not valid");
 
-                _log.Infomation($"Sending Loopy Command - {lc.ToString()}");
+                _log.Information($"Sending Loopy Command - {lc.ToString()}");
                 LoopyCommand response = await connection.SendCommandAsync(lc);
                 Assert.Equal(response.Command, LoopyCommand.CommandType.Play);
-                _log.Infomation($"SendCommand exit with PlaybackStatus: {response.ToString()}");
+                _log.Information($"SendCommand exit with PlaybackStatus: {response.ToString()}");
             }
         }
     }

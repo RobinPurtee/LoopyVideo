@@ -30,7 +30,7 @@ namespace LoopyVideo
                 "MediaUri",
                 typeof(string),
                 typeof(LoopyVideo.MainPage),
-                new PropertyMetadata(null)
+                new PropertyMetadata(MediaSourceUri.Instance.Get())
                 );
 
         private PlayerModel _playerModel;
@@ -78,8 +78,8 @@ namespace LoopyVideo
         public MainPage()
         {
             this.InitializeComponent();
+            //MediaUri = MediaSourceUri.Instance.GetDefaultMediaUri();
             this.DataContext = this;
-            MediaUri = MediaSourceUri.Instance.GetDefaultMediaUri();
         }
 
         /// <summary>
