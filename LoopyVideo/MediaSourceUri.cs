@@ -65,9 +65,9 @@ namespace LoopyVideo
         /// Get the default media uri
         /// </summary>
         /// <returns></returns>
-        public string GetDefaultMediaUriString()
+        public Uri GetDefaultMediaUri()
         {
-            return GetDefaultMediaStorageFileAsync().Path;
+            return new Uri(GetDefaultMediaStorageFileAsync().Path);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@ namespace LoopyVideo
                 if (string.IsNullOrEmpty(uriString) 
                     || !Uri.TryCreate(uriString, UriKind.RelativeOrAbsolute, out newValue))
                 {
-                    newValue = new Uri(GetDefaultMediaUriString());
+                    newValue = GetDefaultMediaUri();
                 }
                 _mediaUri = newValue;
             }

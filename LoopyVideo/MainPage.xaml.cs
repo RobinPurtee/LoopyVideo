@@ -79,7 +79,7 @@ namespace LoopyVideo
         {
             this.InitializeComponent();
             this.DataContext = this;
-            MediaUri = new Uri(MediaSourceUri.Instance.GetDefaultMediaUriString());
+            MediaUri = MediaSourceUri.Instance.GetDefaultMediaUri();
         }
 
         /// <summary>

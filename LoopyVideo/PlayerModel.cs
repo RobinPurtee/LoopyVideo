@@ -154,7 +154,8 @@ namespace LoopyVideo
             {
                 if (MediaUri.IsFile)
                 {
-                    StorageFile mediaFile = StorageFile.GetFileFromPathAsync(MediaUri.LocalPath).GetResults();
+                    
+                    StorageFile mediaFile = StorageFile.GetFileFromPathAsync(MediaUri.LocalPath).AsTask<StorageFile>().Result;
                     source = MediaSource.CreateFromStorageFile(mediaFile);
                 }
                 else
