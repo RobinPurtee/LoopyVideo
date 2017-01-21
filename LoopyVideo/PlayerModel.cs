@@ -12,22 +12,16 @@ using System.Linq;
 
 namespace LoopyVideo
 {
-    public class PlayerModelErrorEventArgs : EventArgs
-    {
-        public string ErrorName { get; set; }
 
-        public PlayerModelErrorEventArgs() { ErrorName = string.Empty; }
-        public PlayerModelErrorEventArgs(string errorName) { ErrorName = errorName; }
-    }
-
-    internal class PlayerModel
+    internal class PlayerModel : IDisposable
     {
-        private Logger _log = new Logger("PlayerModel");
 
         public event EventHandler<PlayerModelErrorEventArgs> ErrorEvent;
 
-
-        private MediaPlayer _player;
+        /// <summary>
+        /// The Player object that to control with this model
+        /// </summary>
+        private MediaPlayer _player = null;
         public MediaPlayer Player
         {
             get { return _player; }
@@ -59,108 +53,144 @@ namespace LoopyVideo
             }
         }
 
-        private Uri _mediaUri;
+        /// <summary>
+        /// The location of the media
+        /// </summary>
         public Uri MediaUri
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// Current state of the playback
+        /// </summary>
+        public MediaPlaybackState State
         {
             get
             {
-                string uriStr = (string)ApplicationData.Current.LocalSettings.Values["mediaSource"];
-                if( string.IsNullOrEmpty(uriStr) 
-                    || !Uri.IsWellFormedUriString(uriStr, UriKind.RelativeOrAbsolute)    
-                    )
+                MediaPlaybackState ret = MediaPlaybackState.None;
+                if (IsValid)
                 {
-                    uriStr = GetDefaultMediaUriString();
+                    ret = Player.PlaybackSession.PlaybackState;
                 }
-                if (_mediaUri.ToString() != uriStr)
-                {
-                    _mediaUri = new Uri(uriStr);
-                }
-
-                return _mediaUri;
-            }
-            set
-            {
-                if(_mediaUri != null && value != _mediaUri)
-                {
-                    ApplicationData.Current.LocalSettings.Values["mediaSource"] = value.ToString();
-                }
-                _mediaUri = value;
-                if(_mediaUri != null && Player != null)
-                {
-                    Player.Source =  Task.Run(GetMediaSource).Result;
-                }
+                return ret;
             }
         }
 
+        /// <summary>
+        /// default contructor
+        /// </summary>
+        public PlayerModel() : this(null, null) { }
 
+        /// <summary>
+        /// Initializing constructor
+        /// </summary>
+        /// <param name="player">The MediaPlayer to control with this object</param>
+        public PlayerModel(MediaPlayer player) : this(player, null) { }
 
-        public PlayerModel(MediaPlayer player, Uri mediaUri)
+        /// <summary>
+        /// Initializing constructor
+        /// </summary>
+        /// <param name="player">The MediaPlayer to control with this object</param>
+        /// <param name="mediaLocation">The location of the media to play</param>
+        public PlayerModel(MediaPlayer player, Uri mediaLocation)
         {
             Player = player;
-            MediaUri = mediaUri;
-        }
-
-        /// <summary>
-        /// Get the base folder (default to the Video library)
-        /// </summary>
-        /// <returns>The base folder to use </returns>
-        private async Task<StorageFolder> GetBaseFolderAsync()
-        {
-            StorageLibrary lib = await StorageLibrary.GetLibraryAsync(KnownLibraryId.Videos);
-            StorageFolder folder = lib.SaveFolder;
-            _log.Information(string.Format("The video library path is: {0}", folder.Path));
-            return folder;
-        }
-
-        /// <summary>
-        /// Get the default media file object
-        /// </summary>
-        /// <returns></returns>
-        private async Task<StorageFile> GetDefaultMediaStorageFileAsync()
-        {
-            StorageFolder folder = await GetBaseFolderAsync();
-            // Get the files in the SaveFolder folder.
-            IReadOnlyList<StorageFile> filesList = await folder.GetFilesAsync();
-            if (filesList.Count == 0)
+            if (mediaLocation != null)
             {
-                throw new FileNotFoundException("There are no files in the video library");
-            }
-            _log.Information(string.Format("The default video file is: {0}", filesList.First().Path));
-            return filesList.First();
-        }
-
-        /// <summary>
-        /// Get the default media uri
-        /// </summary>
-        /// <returns></returns>
-        private string GetDefaultMediaUriString()
-        {
-            return (GetDefaultMediaStorageFileAsync().Result).Path;
-        }
-
-        /// <summary>
-        /// Get the MediaSource 
-        /// </summary>
-        private async Task<MediaSource> GetMediaSource()
-        {
-            MediaSource ret = null;
-
-
-            if (MediaUri.IsFile)
-            {
-                StorageFile mediaFile = await StorageFile.GetFileFromPathAsync(MediaUri.LocalPath);
-                ret = MediaSource.CreateFromStorageFile(mediaFile);
+                MediaUri = mediaLocation;
             }
             else
             {
-                ret = MediaSource.CreateFromUri(MediaUri);
-
+                MediaUri = MediaSourceUri.Instance.Get();
             }
-            return ret;
+            MediaSourceUri.Instance.PropertyChanged += UriPropertyChanged;
+            UpdateMediaSource();      
         }
 
+        /// <summary>
+        /// Test is the player has been set yet
+        /// </summary>
+        public bool IsValid { get { return Player != null; } }
 
 
+        /// <summary>
+        /// Pauses media playback
+        /// </summary>
+        /// <returns>True if the video was paused</returns>
+        public bool Pause()
+        {
+            bool bRet = Player.PlaybackSession.CanPause;
+            if (bRet)
+            {
+                Player.Pause();
+            }
+            return bRet;
+        }
+
+        /// <summary>
+        /// Play the media
+        /// </summary>
+        /// <returns>True if the video playback was started</returns>
+        public bool Play()
+        {
+            bool bRet = State != MediaPlaybackState.Playing;
+            if (bRet)
+            {
+                Player.Play();
+            }
+            return bRet;
+        }
+
+        /// <summary>
+        /// Create and set a new MediaSource
+        /// </summary>
+        private void UpdateMediaSource()
+        {
+            MediaSource source = null;
+
+            if (MediaUri != null)
+            {
+                if (MediaUri.IsFile)
+                {
+                    StorageFile mediaFile = StorageFile.GetFileFromPathAsync(MediaUri.LocalPath).GetResults();
+                    source = MediaSource.CreateFromStorageFile(mediaFile);
+                }
+                else
+                {
+                    source = MediaSource.CreateFromUri(MediaUri);
+
+                }
+            }
+
+            if (Player.Source != null)
+            {
+                Pause();
+                DisposeSource();
+            }
+            Player.Source = source;
+        }
+
+        /// <summary>
+        /// Handler for the MediaSourceUri Changed event
+        /// </summary>
+        /// <param name="sender">not used</param>
+        /// <param name="e">not used</param>
+        private void UriPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == MediaSourceUri.MediaUriName)
+            {
+                MediaUri = MediaSourceUri.Instance.Get();
+                UpdateMediaSource();
+            }
+        }
+
+        #region MediaPlayback event handlers
+        /// <summary>
+        /// Handler for position changed 
+        /// </summary>
+        /// <remarks>limits logging to once a second</remarks>
         private TimeSpan updateTime = new TimeSpan();
         private void Player_PositionChanged(MediaPlaybackSession sender, object args)
         {
@@ -270,26 +300,66 @@ namespace LoopyVideo
             updateTime = TimeSpan.Zero;
         }
 
+        #endregion
 
-        public bool Pause()
+        private Logger _log = new Logger("PlayerModel");
+
+        #region IDisposable Support
+
+        private void DisposeSource()
         {
-            bool bRet = Player.PlaybackSession.CanPause;
-            if(bRet)
+            if (IsValid && Player.Source != null)
             {
-                Player.Pause();
+                ((MediaSource)Player.Source).Dispose();
+                Player.Source = null;
             }
-            return bRet;
+
         }
 
-        public bool Play()
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
         {
-            bool bRet = Player.PlaybackSession.PlaybackState == MediaPlaybackState.Paused;
-            if(bRet)
+            if (!disposedValue)
             {
-                Player.Play();
+                if (disposing)
+                {
+                    DisposeSource();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override a finalizer below.
+                // TODO: set large fields to null.
+
+                disposedValue = true;
             }
-            return bRet;
         }
 
+        // TODO: override a finalizer only if Dispose(bool disposing) above has code to free unmanaged resources.
+        // ~PlayerModel() {
+        //   // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+        //   Dispose(false);
+        // }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+            Dispose(true);
+            // TODO: uncomment the following line if the finalizer is overridden above.
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
+
+    }
+
+    /// <summary>
+    /// Error arguments for the PlayerModel
+    /// </summary>
+    public class PlayerModelErrorEventArgs : EventArgs
+    {
+        public string ErrorName { get; set; }
+
+        public PlayerModelErrorEventArgs() { ErrorName = string.Empty; }
+        public PlayerModelErrorEventArgs(string errorName) { ErrorName = errorName; }
     }
 }

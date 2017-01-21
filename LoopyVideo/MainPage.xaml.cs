@@ -30,102 +30,12 @@ namespace LoopyVideo
                 "MediaUri",
                 typeof(string),
                 typeof(LoopyVideo.MainPage),
-                PropertyMetadata.Create(
-                    () =>
-                    {
-                        Uri ret = null;
-                        string uriStr = (string)ApplicationData.Current.LocalSettings.Values["mediaSource"];
-                        if (string.IsNullOrEmpty(uriStr))
-                        {
-                            ret = Task.Run(MainPage.GetDefaultMediaUriAsync).Result;
-                        }
-                        else
-                        {
-                            ret = new Uri(uriStr);
-                        }
-                        return ret;
-                    },
-                    (o, e) =>
-                    {
-                        Uri oldValue = e.OldValue as Uri;
-                        Uri newValue = e.NewValue as Uri;
-                        if (newValue != oldValue)
-                        {
-                            ApplicationData.Current.LocalSettings.Values["mediaSource"] = newValue.ToString();
-                        }
-                    }
-                )
-            );
+                new PropertyMetadata(null)
+                );
 
         private PlayerModel _playerModel;
 
-        private MediaSource _media;
-        public MediaSource Source
-        {
-            get { return _media; }
-            private set { _media = value; }
-        }
-
-        /// <summary>
-        /// Get the base folder (default to the Video library)
-        /// </summary>
-        /// <returns>The base folder to use </returns>
-        private static async Task<StorageFolder> GetBaseFolderAsync()
-        {
-            StorageLibrary lib = await StorageLibrary.GetLibraryAsync(KnownLibraryId.Videos);
-            StorageFolder folder = lib.SaveFolder;
-            Debug.WriteLine(string.Format("The video library path is: {0}", folder.Path));
-            return folder;
-        }
-
-        /// <summary>
-        /// Get the default media file object
-        /// </summary>
-        /// <returns></returns>
-        private static async Task<StorageFile> GetDefaultMediaStorageFileAsync()
-        {
-            StorageFolder folder = await GetBaseFolderAsync();
-            // Get the files in the SaveFolder folder.
-            IReadOnlyList<StorageFile> filesList = await folder.GetFilesAsync();
-            if (filesList.Count == 0)
-            {
-                throw new FileNotFoundException("There are no files in the video library");
-            }
-            Debug.WriteLine(string.Format("The default video file is: {0}", filesList.First().Path));
-            return filesList.First();
-        }
-
-        /// <summary>
-        /// Get the default media uri
-        /// </summary>
-        /// <returns></returns>
-        private static async Task<Uri> GetDefaultMediaUriAsync()
-        {           
-            return new Uri((await GetDefaultMediaStorageFileAsync()).Path);
-        }
-
-        /// <summary>
-        /// Get the MediaSource 
-        /// </summary>
-        private async Task<MediaSource> GetMediaSource()
-        {
-            MediaSource ret = null;
-            ApplicationDataContainer settings = ApplicationData.Current.LocalSettings;
-
-
-            if (MediaUri.IsFile)
-            {
-                StorageFile mediaFile = await StorageFile.GetFileFromPathAsync(MediaUri.LocalPath);
-                ret = MediaSource.CreateFromStorageFile(mediaFile);
-            }
-            else
-            {
-                ret = MediaSource.CreateFromUri(MediaUri);
-
-            }
-            return ret;
-        }
-
+    
         /// <summary>
         /// Initialize the MediaPlayer of the Player control
         /// </summary>
@@ -135,13 +45,17 @@ namespace LoopyVideo
             _playerModel.ErrorEvent += PlayerModel_ErrorEvent;
         }
 
+        /// <summary>
+        /// Handler for errors reported by the PlayerModel
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void PlayerModel_ErrorEvent(object sender, PlayerModelErrorEventArgs e)
         {
             try
             {
                 var ignored = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () => {
                     string errorMessage;
-                    //errorMessage = (string)Application.Current.Resources[errorName];
                     var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
                     errorMessage = loader.GetString(e.ErrorName);
 
@@ -158,7 +72,6 @@ namespace LoopyVideo
 
         }
 
-
         /// <summary>
         /// Constructor
         /// </summary>
@@ -166,6 +79,7 @@ namespace LoopyVideo
         {
             this.InitializeComponent();
             this.DataContext = this;
+            MediaUri = new Uri(MediaSourceUri.Instance.GetDefaultMediaUriString());
         }
 
         /// <summary>
@@ -180,7 +94,8 @@ namespace LoopyVideo
 
                 _playerElement.IsFullWindow = false;
                 InitMediaPlayer();
-
+                _playerModel.Play();
+                //_playerElement.MediaPlayer.Play();
 
             }
             catch(Exception ex)
@@ -199,7 +114,7 @@ namespace LoopyVideo
         /// <param name="e"></param>
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            ((MediaSource)_playerElement.MediaPlayer.Source).Dispose();  
+            _playerModel?.Dispose();  
         }
 
         /// <summary>
@@ -207,16 +122,10 @@ namespace LoopyVideo
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private async void SetUriButton_Click(object sender, RoutedEventArgs e)
+        private void SetUriButton_Click(object sender, RoutedEventArgs e)
         {
-
-            MediaPlayer player = _playerElement.MediaPlayer;
-            if(player.PlaybackSession.CanPause)
-            {
-                player.Pause();
-            }
-            player.Source = await GetMediaSource();
-            player.Play();
+            _playerModel.MediaUri = MediaUri;
+            _playerModel?.Play();
         }
 
         /// <summary>
