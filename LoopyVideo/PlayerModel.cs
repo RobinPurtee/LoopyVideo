@@ -13,7 +13,7 @@ using System.Linq;
 namespace LoopyVideo
 {
 
-    internal class PlayerModel : BindableBase, IDisposable
+    public sealed class PlayerModel : BindableBase, IDisposable
     {
         public event EventHandler<PlayerModelErrorEventArgs> ErrorEvent;
 
@@ -116,6 +116,11 @@ namespace LoopyVideo
                     _player.PlaybackSession.SeekCompleted += Player_SeekCompleted;
                     UpdateMediaSource();
                 }
+                else
+                {
+                    DisposeSource();
+                    _player = null;
+                }
             }
         }
 
@@ -164,7 +169,7 @@ namespace LoopyVideo
         /// <summary>
         /// Test is the player has been set yet
         /// </summary>
-        public bool IsValid { get { return Player != null; } }
+        public bool IsValid { get { return Player != null && Player.Source != null; } }
 
 
         /// <summary>
@@ -173,10 +178,14 @@ namespace LoopyVideo
         /// <returns>True if the video was paused</returns>
         public bool Pause()
         {
-            bool bRet = Player.PlaybackSession.CanPause;
-            if (bRet)
+            bool bRet = false;
+            if (IsValid)
             {
-                Player.Pause();
+                bRet = Player.PlaybackSession.CanPause;
+                if (bRet)
+                {
+                    Player.Pause();
+                }
             }
             return bRet;
         }
@@ -187,10 +196,15 @@ namespace LoopyVideo
         /// <returns>True if the video playback was started</returns>
         public bool Play()
         {
-            bool bRet = State != MediaPlaybackState.Playing;
-            if (bRet)
+
+            bool bRet = false;
+            if (IsValid)
             {
-                Player.Play();
+                bRet = State != MediaPlaybackState.Playing;
+                if (bRet)
+                {
+                    Player.Play();
+                }
             }
             return bRet;
         }
@@ -358,7 +372,7 @@ namespace LoopyVideo
 
         private bool disposedValue = false; // To detect redundant calls
 
-        protected virtual void Dispose(bool disposing)
+        protected void Dispose(bool disposing)
         {
             if (!disposedValue)
             {

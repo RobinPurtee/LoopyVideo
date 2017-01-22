@@ -17,7 +17,7 @@ namespace LoopyAppServiceTest
             get { return (string)GetValue(ConnectionStatusProperty); }
             set
             {
-                _log.Infomation($"Setting Connection Status {value.ToString()}");
+                _log.Information($"Setting Connection Status {value.ToString()}");
                 SetValue(ConnectionStatusProperty, value);
             }
         }
@@ -33,7 +33,7 @@ namespace LoopyAppServiceTest
             get { return (string)GetValue(PlaybackStatusProperty); }
             set
             {
-                _log.Infomation($"Setting Playback Status {value.ToString()}");
+                _log.Information($"Setting Playback Status {value.ToString()}");
                 SetValue(PlaybackStatusProperty, value);
             }
         }
@@ -54,14 +54,14 @@ namespace LoopyAppServiceTest
             {
                 if (_serviceConnection != null)
                 {
-                    _log.Infomation("Disposing of old connection");
+                    _log.Information("Disposing of old connection");
                     _serviceConnection.MessageReceived -= CommandReceived;
                     _serviceConnection.Dispose();
                 }
                 _serviceConnection = value;
                 if (_serviceConnection != null)
                 {
-                    _log.Infomation("new connection set");
+                    _log.Information("new connection set");
                     _serviceConnection.MessageReceived += CommandReceived;
                 }
             }
@@ -69,7 +69,7 @@ namespace LoopyAppServiceTest
 
         private LoopyCommand CommandReceived(LoopyCommand command)
         {
-            _log.Infomation($"Command received: {command.ToString()}");
+            _log.Information($"Command received: {command.ToString()}");
             // TODO: implement state container
             return command;
         }
@@ -77,12 +77,12 @@ namespace LoopyAppServiceTest
         public MainPage()
         {
             this.InitializeComponent();
-            _log.Infomation("MainPage Created");
+            _log.Information("MainPage Created");
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            _log.Infomation("MainPage Loaded");
+            _log.Information("MainPage Loaded");
             DataContext = this;
             if (ServiceConnection == null)
             {
@@ -100,7 +100,7 @@ namespace LoopyAppServiceTest
             // Add the connection.
             if (ServiceConnection == null || !ServiceConnection.IsValid())
             {
-                _log.Infomation("Starting the connection");
+                _log.Information("Starting the connection");
                 //if (ServiceConnection == null)
                 //{
                 //    ServiceConnection = new AppConnection();
@@ -109,10 +109,10 @@ namespace LoopyAppServiceTest
             }
         }
 
-        private async void SendPlaybackCommand(LoopyCommand.CommandType command, string param = "")
+        private async void SendPlaybackCommand(CommandType command, string param = "")
         {
 
-            _log.Infomation("Opening the connection to the service");
+            _log.Information("Opening the connection to the service");
             
             if (!ServiceConnection.IsValid())
             {
@@ -124,7 +124,7 @@ namespace LoopyAppServiceTest
             try
             {
             
-                _log.Infomation($"Sending Command {lc.ToString()}");
+                _log.Information($"Sending Command {lc.ToString()}");
                 LoopyCommand response = await ServiceConnection.SendCommandAsync(lc);
                 PlaybackStatus = response.ToString();
             }
@@ -132,17 +132,17 @@ namespace LoopyAppServiceTest
             {
                 PlaybackStatus = ex.Message;
             }
-            _log.Infomation($"SendCommand exit with PlaybackStatus: {PlaybackStatus}");
+            _log.Information($"SendCommand exit with PlaybackStatus: {PlaybackStatus}");
         }
 
         private void Play_Click(object sender, RoutedEventArgs e)
         {
-            SendPlaybackCommand(LoopyCommand.CommandType.Play);
+            SendPlaybackCommand(CommandType.Play);
         }
 
         private void Stop_Click(object sender, RoutedEventArgs e)
         {
-            SendPlaybackCommand(LoopyCommand.CommandType.Stop);
+            SendPlaybackCommand(CommandType.Stop);
         }
 
     }

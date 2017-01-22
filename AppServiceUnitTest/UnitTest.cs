@@ -19,12 +19,12 @@ namespace AppServiceUnitTest
                 var status = await connection.OpenConnectionAsync();
                 Assert.Equal(AppServiceConnectionStatus.Success, status);
 
-                LoopyCommand lc = new LoopyCommand(LoopyCommand.CommandType.Play, null);
+                LoopyCommand lc = new LoopyCommand(CommandType.Play, null);
                 Assert.True(connection.IsValid(), "The appliccation connection is not valid");
 
                 _log.Information($"Sending Loopy Command - {lc.ToString()}");
                 LoopyCommand response = await connection.SendCommandAsync(lc);
-                Assert.Equal(response.Command, LoopyCommand.CommandType.Play);
+                Assert.Equal(response.Command, CommandType.Play);
                 _log.Information($"SendCommand exit with PlaybackStatus: {response.ToString()}");
             }
         }

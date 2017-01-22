@@ -17,6 +17,15 @@ namespace LoopyVideo
 
         Logger _log = new Logger("LoopyVideo.App");
 
+
+        private PlayerModel _playerModel = new PlayerModel();
+
+        public PlayerModel Player
+        {
+            get { return _playerModel; }
+            set { _playerModel = value; }
+        }
+
         /// <summary>
         /// The connection to the LoopyVideo.Webservice
         /// </summary>
@@ -44,17 +53,33 @@ namespace LoopyVideo
         private LoopyCommand CommandReceived(LoopyCommand command)
         {
             _log.Information($"Command received: {command.ToString()}");
-            LoopyCommand retCommand = new LoopyCommand(Commands.CommandType.Error, $"Unsupported command type {command.Command.ToString()}");
+            LoopyCommand retCommand = new LoopyCommand(LoopyCommand.CommandType.Error, $"Unsupported command type {command.Command.ToString()}");
             switch (command.Command)
             {
-                case Commands.CommandType.Play:
-                    TogglePlayState();
-                    retCommand.Copy(command);
+                case LoopyCommand.CommandType.Play:
+                    if(Player.IsValid)
+                    {
+                        Player.Play();
+                        retCommand.Copy(command);
+                    }
+                    else
+                    {
+                        retCommand.Param = "";
+                    }
                     break;
-                case Commands.CommandType.Stop:
-                    ToggleStopState();
-                    retCommand.Copy(command);
+                case LoopyCommand.CommandType.Stop:
+                    if (Player.IsValid)
+                    {
+                        Player.Pause();
+                        retCommand.Copy(command);
+                    }
+                    else
+                    {
+                        retCommand.Param = "";
+                    }
                     break;
+                case LoopyCommand.CommandType.Media:
+
                 default:
                     break;
 
@@ -71,6 +96,13 @@ namespace LoopyVideo
         {
             this.InitializeComponent();
             this.Suspending += OnSuspending;
+        }
+
+        public string GetErrorString(string errorName)
+        {
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+            return loader.GetString(errorName);
+
         }
 
         /// <summary>

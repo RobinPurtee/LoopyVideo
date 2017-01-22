@@ -13,10 +13,10 @@ namespace LoopyVideo.WebService
     [RestController(InstanceCreationType.Singleton)]
     class LoopyCommandController
     {
-        private IGetResponse SendAppCommand(CommandType command, string param = "")
+        private IGetResponse SendAppCommand(LoopyCommand.CommandType command, string param = "")
         {
             LoopyCommand lc = new LoopyCommand(command, param);
-            LoopyCommand retCommand = new LoopyCommand(CommandType.Error, "AppConnection is invalid");
+            LoopyCommand retCommand = new LoopyCommand(LoopyCommand.CommandType.Error, "AppConnection is invalid");
             if (AppConnectionFactory.IsValid)
             {
                 Task<LoopyCommand> sendTask = AppConnectionFactory.Instance.SendCommandAsync(lc).AsTask();
@@ -32,13 +32,13 @@ namespace LoopyVideo.WebService
         [UriFormat("/play")]
         public IGetResponse PlayCommand()
         {
-            return SendAppCommand(CommandType.Play);
+            return SendAppCommand(LoopyCommand.CommandType.Play);
         }
 
         [UriFormat("/stop")]
         public IGetResponse StopCommand()
         {
-            return SendAppCommand(CommandType.Stop);
+            return SendAppCommand(LoopyCommand.CommandType.Stop);
         }
     }
 }

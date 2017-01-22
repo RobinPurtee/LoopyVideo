@@ -8,20 +8,20 @@ using Windows.UI.Xaml.Data;
 
 namespace LoopyVideo.Commands
 {
-    public enum CommandType
-    {
-        Unknown,
-        Error,
-        Play,
-        Stop,
-        Media
-    };
-
+ 
     public sealed class LoopyCommand
     {
         private readonly static string commandName = "Command";
         private readonly static string paramName = "Param";
 
+        public enum CommandType
+        {
+            Unknown,
+            Error,
+            Play,
+            Stop,
+            Media
+        };
 
 
         public CommandType Command { get; set; }

@@ -126,6 +126,12 @@
   <data name="MediaPlayerError_NetworkError" xml:space="preserve">
     <value>There was a network error during media playback</value>
   </data>
+  <data name="MediaPlayerError_NoMediaForPlay" xml:space="preserve">
+    <value>The Player does not currently have any media to play</value>
+  </data>
+  <data name="MediaPlayerError_PauseNotAvailable" xml:space="preserve">
+    <value>The Player is not currently in a pauseable state</value>
+  </data>
   <data name="MediaPlayerError_SourceNotSupported" xml:space="preserve">
     <value>The media is in an unsupported format</value>
   </data>

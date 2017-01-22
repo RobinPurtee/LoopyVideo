@@ -20,6 +20,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoopyVideo.Logging", "LoopyVideo.Logging\LoopyVideo.Logging.csproj", "{4221013B-616C-4FF0-A67A-F6316B2D502C}"
 EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		AppServiceCommands\AppServiceCommands.projitems*{ff2ed7c1-c956-454d-a623-d02569eacfef}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|ARM = Debug|ARM

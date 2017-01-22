@@ -211,7 +211,7 @@ namespace LoopyVideo.Commands
                    if(response.Status != AppServiceResponseStatus.Success)
                    {
                        retCommand = new LoopyCommand(
-                                                    CommandType.Error,
+                                                    LoopyCommand.CommandType.Error,
                                                     $"Command response status: {response.Status} with message: {ValueSetOut.ToString(response.Message)}"
                                                     );
                        _log.Error(retCommand.Param.ToString());  

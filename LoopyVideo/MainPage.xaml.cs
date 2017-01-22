@@ -19,12 +19,9 @@ namespace LoopyVideo
     {
         private static Logger _log = new Logger("LoopyVideoMain");
 
-        private PlayerModel _playerModel;
-
-        internal PlayerModel PlayerModel
+        public PlayerModel MediaPlayerModel
         {
-            get { return _playerModel; }
-            set { _playerModel = value; }
+            get { return ((LoopyVideo.App)Application.Current).Player ; }
         }
 
         /// <summary>
@@ -32,10 +29,8 @@ namespace LoopyVideo
         /// </summary>
         private void InitMediaPlayer()
         {
-            PlayerModel.Player = _playerElement.MediaPlayer;
-            PlayerModel.ErrorEvent += PlayerModel_ErrorEvent;
-            this.DataContext = _playerElement;
-
+            MediaPlayerModel.Player = _playerElement.MediaPlayer;
+            MediaPlayerModel.ErrorEvent += PlayerModel_ErrorEvent;
         }
 
         /// <summary>
@@ -48,9 +43,7 @@ namespace LoopyVideo
             try
             {
                 var ignored = this.Dispatcher.RunAsync(Windows.UI.Core.CoreDispatcherPriority.Low, async () => {
-                    string errorMessage;
-                    var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
-                    errorMessage = loader.GetString(e.ErrorName);
+                    string errorMessage = ((LoopyVideo.App)Application.Current).GetErrorString(e.ErrorName);
 
                     _log.Information($"The media source has failed : {errorMessage}");
                     MessageDialog dialog = new MessageDialog(errorMessage);
@@ -71,7 +64,6 @@ namespace LoopyVideo
         public MainPage()
         {
             InitializeComponent();
-            PlayerModel = new PlayerModel();
         }
 
         /// <summary>
@@ -86,9 +78,7 @@ namespace LoopyVideo
 
                 _playerElement.IsFullWindow = false;
                 InitMediaPlayer();
-                PlayerModel.Play();
-                //_playerElement.MediaPlayer.Play();
-
+                MediaPlayerModel.Play();
             }
             catch(Exception ex)
             {
@@ -106,7 +96,7 @@ namespace LoopyVideo
         /// <param name="e"></param>
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            PlayerModel.Dispose();  
+            MediaPlayerModel.Player = null;  
         }
 
         /// <summary>
@@ -116,8 +106,8 @@ namespace LoopyVideo
         /// <param name="e"></param>
         private void SetUriButton_Click(object sender, RoutedEventArgs e)
         {
-            PlayerModel.MediaUri = new Uri(_uri.Text);
-            PlayerModel.Play();
+            MediaPlayerModel.MediaUri = new Uri(_uri.Text);
+            MediaPlayerModel.Play();
         }
 
         /// <summary>

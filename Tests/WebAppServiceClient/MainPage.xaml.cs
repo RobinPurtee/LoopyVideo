@@ -42,16 +42,16 @@ namespace WebAppServiceClient
         private LoopyCommand CommandReceived(LoopyCommand command)
         {
             _log.Information($"Command received: {command.ToString()}");
-            LoopyCommand retCommand = new LoopyCommand(CommandType.Error, $"Unsupported command type {command.Command.ToString()}");
+            LoopyCommand retCommand = new LoopyCommand(LoopyCommand.CommandType.Error, $"Unsupported command type {command.Command.ToString()}");
             Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
             {
                 switch (command.Command)
                 {
-                    case CommandType.Play:
+                    case LoopyCommand.CommandType.Play:
                         TogglePlayState();
                         retCommand.Copy(command);
                         break;
-                    case CommandType.Stop:
+                    case LoopyCommand.CommandType.Stop:
                         ToggleStopState();
                         retCommand.Copy(command);
                         break;
@@ -91,7 +91,7 @@ namespace WebAppServiceClient
 
         private void PlayButton_Click(object sender, RoutedEventArgs e)
         {
-            SendPlaybackCommand(CommandType.Play);
+            SendPlaybackCommand(LoopyCommand.CommandType.Play);
         }
 
         private void StopButton_Click(object sender, RoutedEventArgs e)
@@ -113,7 +113,7 @@ namespace WebAppServiceClient
 
 
 
-        private async void SendPlaybackCommand(CommandType command, string param = "")
+        private async void SendPlaybackCommand(LoopyCommand.CommandType command, string param = "")
         {
 
             _log.Information("Opening the connection to the service");
