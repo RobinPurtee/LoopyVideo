@@ -9,10 +9,8 @@
     <Import_RootNamespace>AppServiceCommands</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(MSBuildThisFileDirectory)Bindable.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Logger.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LoopyAppConnection.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)LoopyCommand.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)WebServerManager.cs" />
   </ItemGroup>
 </Project>

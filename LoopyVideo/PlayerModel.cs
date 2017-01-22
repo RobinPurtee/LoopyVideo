@@ -13,7 +13,7 @@ using System.Linq;
 namespace LoopyVideo
 {
 
-    public class PlayerModel : BindableBase, IDisposable
+    internal class PlayerModel : BindableBase, IDisposable
     {
         public event EventHandler<PlayerModelErrorEventArgs> ErrorEvent;
 

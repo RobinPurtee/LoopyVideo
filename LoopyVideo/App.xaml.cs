@@ -1,19 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using LoopyVideo.Logging;
+using LoopyVideo.Commands;
 
 namespace LoopyVideo
 {
@@ -23,7 +15,53 @@ namespace LoopyVideo
     sealed partial class App : Application
     {
 
-        
+        Logger _log = new Logger("LoopyVideo.App");
+
+        /// <summary>
+        /// The connection to the LoopyVideo.Webservice
+        /// </summary>
+        private AppConnection _serviceConnection;
+        public AppConnection ServiceConnection
+        {
+            get { return _serviceConnection; }
+            set
+            {
+                if (_serviceConnection != null)
+                {
+                    _log.Information("Disposing of old connection");
+                    _serviceConnection.MessageReceived -= CommandReceived;
+                    _serviceConnection.Dispose();
+                }
+                _serviceConnection = value;
+                if (_serviceConnection != null)
+                {
+                    _log.Information("new connection set");
+                    _serviceConnection.MessageReceived += CommandReceived;
+                }
+            }
+        }
+
+        private LoopyCommand CommandReceived(LoopyCommand command)
+        {
+            _log.Information($"Command received: {command.ToString()}");
+            LoopyCommand retCommand = new LoopyCommand(Commands.CommandType.Error, $"Unsupported command type {command.Command.ToString()}");
+            switch (command.Command)
+            {
+                case Commands.CommandType.Play:
+                    TogglePlayState();
+                    retCommand.Copy(command);
+                    break;
+                case Commands.CommandType.Stop:
+                    ToggleStopState();
+                    retCommand.Copy(command);
+                    break;
+                default:
+                    break;
+
+            }
+            return retCommand;
+        }
+
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code

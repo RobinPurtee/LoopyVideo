@@ -19,23 +19,9 @@ namespace LoopyVideo
     {
         private static Logger _log = new Logger("LoopyVideoMain");
 
-        //public Uri MediaUri
-        //{
-        //    get { return (Uri)GetValue(MediaUriProperty); }
-        //    set { SetValue(MediaUriProperty, value); }
-        //}
-
-        //private static readonly DependencyProperty MediaUriProperty =
-        //    DependencyProperty.Register(
-        //        "MediaUri",
-        //        typeof(string),
-        //        typeof(LoopyVideo.MainPage),
-        //        new PropertyMetadata(MediaSourceUri.Instance.MediaUri)
-        //        );
-
         private PlayerModel _playerModel;
 
-        public PlayerModel PlayerModel
+        internal PlayerModel PlayerModel
         {
             get { return _playerModel; }
             set { _playerModel = value; }

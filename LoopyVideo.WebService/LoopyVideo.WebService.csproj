@@ -143,8 +143,16 @@
     </Content>
     <Content Include="Web\Windows_10_Logo.png" />
   </ItemGroup>
-  <ItemGroup />
-  <Import Project="..\AppServiceCommands\AppServiceCommands.projitems" Label="Shared" />
+  <ItemGroup>
+    <ProjectReference Include="..\LoopyVideo.Commands\LoopyVideo.Commands.csproj">
+      <Project>{8caeb7a3-a50b-4e93-a508-b955857f92c7}</Project>
+      <Name>LoopyVideo.Commands</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LoopyVideo.Logging\LoopyVideo.Logging.csproj">
+      <Project>{4221013b-616c-4ff0-a67a-f6316b2d502c}</Project>
+      <Name>LoopyVideo.Logging</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
