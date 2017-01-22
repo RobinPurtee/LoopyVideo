@@ -24,9 +24,9 @@
                             AreTransportControlsEnabled="False"/>
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="Video Uri:" VerticalAlignment="Center" Margin="0,0,4,0"/>
-            <TextBox Text="{x:Bind MediaUri,Mode=TwoWay,Converter={StaticResource TwoWayUriConverter}}" Width="300"/>
-            <Button x:Name="filePick" Content="..." Margin="3" Click="filePick_Click"/>
-            <Button x:Name="SetUriButton" Content="Load" Click="SetUriButton_Click" Margin="3"/>
+            <TextBox x:Name="_uri" Text="{x:Bind Path=PlayerModel.MediaUri,Mode=TwoWay,Converter={StaticResource TwoWayUriConverter}}"/>
+            <Button x:Name="_filePick" Content="..." Margin="3" Click="filePick_Click"/>
+            <Button x:Name="_uriButton" Content="Load" Click="SetUriButton_Click" Margin="3"/>
         </StackPanel>
     </StackPanel>
 </Page>

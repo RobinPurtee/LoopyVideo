@@ -19,30 +19,37 @@ namespace LoopyVideo
     {
         private static Logger _log = new Logger("LoopyVideoMain");
 
-        public Uri MediaUri
-        {
-            get { return (Uri)GetValue(MediaUriProperty); }
-            set { SetValue(MediaUriProperty, value); }
-        }
+        //public Uri MediaUri
+        //{
+        //    get { return (Uri)GetValue(MediaUriProperty); }
+        //    set { SetValue(MediaUriProperty, value); }
+        //}
 
-        private static readonly DependencyProperty MediaUriProperty =
-            DependencyProperty.Register(
-                "MediaUri",
-                typeof(string),
-                typeof(LoopyVideo.MainPage),
-                new PropertyMetadata(MediaSourceUri.Instance.Get())
-                );
+        //private static readonly DependencyProperty MediaUriProperty =
+        //    DependencyProperty.Register(
+        //        "MediaUri",
+        //        typeof(string),
+        //        typeof(LoopyVideo.MainPage),
+        //        new PropertyMetadata(MediaSourceUri.Instance.MediaUri)
+        //        );
 
         private PlayerModel _playerModel;
 
-    
+        public PlayerModel PlayerModel
+        {
+            get { return _playerModel; }
+            set { _playerModel = value; }
+        }
+
         /// <summary>
         /// Initialize the MediaPlayer of the Player control
         /// </summary>
         private void InitMediaPlayer()
         {
-            _playerModel = new PlayerModel(_playerElement.MediaPlayer, MediaUri);
-            _playerModel.ErrorEvent += PlayerModel_ErrorEvent;
+            PlayerModel.Player = _playerElement.MediaPlayer;
+            PlayerModel.ErrorEvent += PlayerModel_ErrorEvent;
+            this.DataContext = _playerElement;
+
         }
 
         /// <summary>
@@ -77,9 +84,8 @@ namespace LoopyVideo
         /// </summary>
         public MainPage()
         {
-            this.InitializeComponent();
-            //MediaUri = MediaSourceUri.Instance.GetDefaultMediaUri();
-            this.DataContext = this;
+            InitializeComponent();
+            PlayerModel = new PlayerModel();
         }
 
         /// <summary>
@@ -94,7 +100,7 @@ namespace LoopyVideo
 
                 _playerElement.IsFullWindow = false;
                 InitMediaPlayer();
-                _playerModel.Play();
+                PlayerModel.Play();
                 //_playerElement.MediaPlayer.Play();
 
             }
@@ -114,7 +120,7 @@ namespace LoopyVideo
         /// <param name="e"></param>
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            _playerModel?.Dispose();  
+            PlayerModel.Dispose();  
         }
 
         /// <summary>
@@ -124,8 +130,8 @@ namespace LoopyVideo
         /// <param name="e"></param>
         private void SetUriButton_Click(object sender, RoutedEventArgs e)
         {
-            _playerModel.MediaUri = MediaUri;
-            _playerModel?.Play();
+            PlayerModel.MediaUri = new Uri(_uri.Text);
+            PlayerModel.Play();
         }
 
         /// <summary>
@@ -147,7 +153,7 @@ namespace LoopyVideo
             if (file != null)
             {
                 // Application now has read/write access to the picked file
-                MediaUri = new Uri(file.Path);
+                _uri.Text = file.Path;
             }
  
         }

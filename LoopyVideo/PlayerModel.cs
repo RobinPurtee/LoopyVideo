@@ -13,10 +13,76 @@ using System.Linq;
 namespace LoopyVideo
 {
 
-    internal class PlayerModel : IDisposable
+    public class PlayerModel : BindableBase, IDisposable
     {
-
         public event EventHandler<PlayerModelErrorEventArgs> ErrorEvent;
+
+        private const string settingsName = "MediaSource";
+
+        private Uri _mediaUri;
+        public Uri MediaUri
+        {
+            get
+            {
+                if (_mediaUri == null)
+                {
+                    Uri newValue;
+                    string uriString = CurrentSetting;
+
+                    if (string.IsNullOrEmpty(uriString)
+                        || !Uri.TryCreate(uriString, UriKind.RelativeOrAbsolute, out newValue))
+                    {
+                        newValue = GetDefaultMediaUri();
+                    }
+                    _mediaUri = newValue;
+                }
+                _log.Information($"Media Uri: {_mediaUri.AbsolutePath}");
+                return _mediaUri;
+            }
+            set
+            {
+                if (SetProperty(ref _mediaUri, value))
+                { 
+                    CurrentSetting = value.ToString();
+                    UpdateMediaSource();
+                }
+            }
+        }
+
+
+        private string CurrentSetting
+        {
+            get { return (string)ApplicationData.Current.LocalSettings.Values[settingsName]; }
+            set { ApplicationData.Current.LocalSettings.Values[settingsName] = value; }
+        }
+
+
+        /// <summary>
+        /// Get the default media file object
+        /// </summary>
+        /// <returns></returns>
+        private StorageFile GetDefaultMediaStorageFileAsync()
+        {
+            StorageLibrary lib = StorageLibrary.GetLibraryAsync(KnownLibraryId.Videos).GetAwaiter().GetResult();
+            StorageFolder folder = lib.SaveFolder;
+            // Get the files in the SaveFolder folder.
+            IReadOnlyList<StorageFile> filesList = folder.GetFilesAsync().GetAwaiter().GetResult();
+            if (filesList.Count == 0)
+            {
+                throw new FileNotFoundException("There are no files in the video library");
+            }
+            return filesList.First();
+        }
+
+        /// <summary>
+        /// Get the default media uri
+        /// </summary>
+        /// <returns></returns>
+        private Uri GetDefaultMediaUri()
+        {
+            return new Uri(GetDefaultMediaStorageFileAsync().Path);
+        }
+
 
         /// <summary>
         /// The Player object that to control with this model
@@ -25,7 +91,7 @@ namespace LoopyVideo
         public MediaPlayer Player
         {
             get { return _player; }
-            private set
+            set
             {
                 _player = value;
                 if (_player != null)
@@ -48,20 +114,12 @@ namespace LoopyVideo
                     _player.PlaybackSession.PlaybackStateChanged += Player_PlaybackStateChanged;
                     _player.PlaybackSession.PositionChanged += Player_PositionChanged;
                     _player.PlaybackSession.SeekCompleted += Player_SeekCompleted;
-
+                    UpdateMediaSource();
                 }
             }
         }
 
-        /// <summary>
-        /// The location of the media
-        /// </summary>
-        public Uri MediaUri
-        {
-            get { return MediaSourceUri.Instance.Get(); }
-            set { MediaSourceUri.Instance.Set(value); }
-        }
-
+       
         /// <summary>
         /// Current state of the playback
         /// </summary>
@@ -97,7 +155,6 @@ namespace LoopyVideo
         public PlayerModel(MediaPlayer player, Uri mediaLocation)
         {
             Player = player;
-            MediaSourceUri.Instance.PropertyChanged += UriPropertyChanged;
             if (mediaLocation != null)
             {
                 MediaUri = mediaLocation;
@@ -150,7 +207,7 @@ namespace LoopyVideo
                 if (MediaUri.IsFile)
                 {
                     
-                    StorageFile mediaFile = StorageFile.GetFileFromPathAsync(MediaUri.LocalPath).AsTask<StorageFile>().Result;
+                    StorageFile mediaFile = StorageFile.GetFileFromPathAsync(MediaUri.LocalPath).GetAwaiter().GetResult();
                     source = MediaSource.CreateFromStorageFile(mediaFile);
                 }
                 else
@@ -168,19 +225,6 @@ namespace LoopyVideo
             Player.Source = source;
         }
 
-        /// <summary>
-        /// Handler for the MediaSourceUri Changed event
-        /// </summary>
-        /// <param name="sender">not used</param>
-        /// <param name="e">not used</param>
-        private void UriPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == MediaSourceUri.MediaUriName)
-            {
-                //MediaUri = MediaSourceUri.Instance.Get();
-                UpdateMediaSource();
-            }
-        }
 
         #region MediaPlayback event handlers
         /// <summary>

@@ -19,6 +19,10 @@ namespace LoopyVideo
                     ret = uri.ToString();
                 }
             }
+            else
+            {
+                throw new ArgumentException("UriConverter.Convert: Only Uri to String convertion supported");
+            }
             return ret;
         }
 
@@ -28,6 +32,10 @@ namespace LoopyVideo
             if(typeof(Uri) ==  targetType)
             {
                 ret = new Uri(value as string);
+            }
+            else
+            {
+                throw new ArgumentException("UriConverter.ConvertBack: Only String to Uri convertion supported");
             }
             return ret;
         }
