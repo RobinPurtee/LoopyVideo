@@ -22,11 +22,11 @@
                             Stretch="UniformToFill"
                             Width="640" Height="480"
                             AreTransportControlsEnabled="False"/>
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="Video Uri:" VerticalAlignment="Center" Margin="0,0,4,0"/>
-            <TextBox x:Name="_uri" Text="{x:Bind Path=MediaPlayerModel.MediaUri,Mode=TwoWay,Converter={StaticResource TwoWayUriConverter}}"/>
-            <Button x:Name="_filePick" Content="..." Margin="3" Click="filePick_Click"/>
-            <Button x:Name="_uriButton" Content="Load" Click="SetUriButton_Click" Margin="3"/>
-        </StackPanel>
+        <RelativePanel Margin="0" >
+            <TextBlock x:Name="_uriLabel" Text="Video Uri:" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="0,0,8,0" Height="20" Width="65" RelativePanel.AlignLeftWithPanel="True" Padding="0" RelativePanel.AlignVerticalCenterWithPanel="True"  />
+            <TextBox x:Name="_uri" Text="{x:Bind Converter={StaticResource TwoWayUriConverter}, Mode=TwoWay, Path=MediaPlayerModel.MediaUri}" RelativePanel.RightOf="_uriLabel" />
+            <Button x:Name="_filePick" Content="..." Click="filePick_Click" RelativePanel.LeftOf="_uriButton" Height="32" Width="30" Grid.Column="1" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,8,0"/>
+            <Button x:Name="_uriButton" Content="Load" Click="SetUriButton_Click" Grid.Column="2"  Height="32" Width="52" RelativePanel.AlignRightWithPanel="True" RelativePanel.AlignVerticalCenterWithPanel="True" Margin="0,0,8,0"/>
+        </RelativePanel>
     </StackPanel>
 </Page>

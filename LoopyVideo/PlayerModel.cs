@@ -248,11 +248,11 @@ namespace LoopyVideo
         private TimeSpan updateTime = new TimeSpan();
         private void Player_PositionChanged(MediaPlaybackSession sender, object args)
         {
-            if (sender.Position > updateTime)
-            {
-                _log.Information($"PlayBack Session Position Changed to: {sender.Position.ToString()}");
-                updateTime += TimeSpan.FromSeconds(1.0);
-            }
+            //if (sender.Position > updateTime)
+            //{
+            //    _log.Information($"PlayBack Session Position Changed to: {sender.Position.ToString()}");
+            //    updateTime += TimeSpan.FromSeconds(1.0);
+            //}
         }
         /// <summary>
         /// Playback State Changed
@@ -372,7 +372,7 @@ namespace LoopyVideo
 
         private bool disposedValue = false; // To detect redundant calls
 
-        protected void Dispose(bool disposing)
+        private void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
