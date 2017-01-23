@@ -11,12 +11,6 @@ using LoopyVideo.Logging;
 
 namespace LoopyVideo.Commands
 {
-    /// <summary>
-    /// Message Recieved event handler
-    /// </summary>
-    /// <param name="command">The command recieved</param>
-    /// <returns>The current status </returns>
-    public delegate LoopyCommand ReceiveMessage(LoopyCommand command);
 
     /// <summary>
     /// The connection between LoopyVideo.AppService and  the apps being serviced
@@ -27,6 +21,12 @@ namespace LoopyVideo.Commands
 
         private readonly static string _serviceNameDefault = "net.manipulatormanor.LoopyWebServer";
         private readonly static string _serviceFamilyNameDefault = "LoopyVideo.WebService-uwp_n1q2psqd6svm2";
+        /// <summary>
+        /// Message Recieved event handler
+        /// </summary>
+        /// <param name="command">The command recieved</param>
+        /// <returns>The current status </returns>
+        public delegate LoopyCommand ReceiveMessage(LoopyCommand command);
 
         public event ReceiveMessage MessageReceived;
 
@@ -96,8 +96,16 @@ namespace LoopyVideo.Commands
 
         public bool IsValid()
         {
-            _log.Information($"AppConnection.IsValid: {((null != Connection) ? "is Connected" : "is Not connected}")} and Status : {Status.ToString()}");
-            return (null != Connection) && (Status == AppServiceConnectionStatus.Success);
+            try
+            {
+                _log.Information($"AppConnection.IsValid: {((null != Connection) ? "is Connected" : "is Not connected}")} and Status : {Status.ToString()}");
+                return (null != Connection) && (Status == AppServiceConnectionStatus.Success);
+            }
+            catch(Exception ex)
+            {
+                _log.Error($"Exception getting status: {ex.Message}");
+            }
+            return false;
         }
 
 

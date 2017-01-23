@@ -31,7 +31,6 @@ namespace LoopyVideo.WebService
             {
                 var serviceTrigger = taskInstance.TriggerDetails as AppServiceTriggerDetails;
                 AppConnectionFactory.Instance.Connection = serviceTrigger.AppServiceConnection;
-                AppConnectionFactory.Instance.MessageReceived += ReceiveAppCommand; ;
             }
             catch(Exception ex)
             {
@@ -54,7 +53,7 @@ namespace LoopyVideo.WebService
                     _log.Information("Creating Web Server");
                     _webServer = new HttpServer(configuration);
                     await _webServer.StartServerAsync();
-                    _log.Information("Web Server Task ended");
+                    _log.Information("Web Server Started");
                 }
                 catch (Exception ex)
                 {
@@ -63,15 +62,6 @@ namespace LoopyVideo.WebService
             }
         }
 
-        private LoopyCommand ReceiveAppCommand(LoopyCommand command)
-        {
-            _log.Information($"Received {command.ToString()} command from the Appication");
-
-            // echo the command back
-
-
-            return command;
-        }
 
         private void Server_Canceled(IBackgroundTaskInstance sender, BackgroundTaskCancellationReason reason)
         {

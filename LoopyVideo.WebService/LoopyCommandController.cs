@@ -13,19 +13,21 @@ namespace LoopyVideo.WebService
     [RestController(InstanceCreationType.Singleton)]
     class LoopyCommandController
     {
+
+        Logging.Logger _log = new Logging.Logger("LoopyCommandController");
+
         private IGetResponse SendAppCommand(LoopyCommand.CommandType command, string param = "")
         {
             LoopyCommand lc = new LoopyCommand(command, param);
             LoopyCommand retCommand = new LoopyCommand(LoopyCommand.CommandType.Error, "AppConnection is invalid");
+            _log.Information($"Sending command {lc.ToString()}");
             if (AppConnectionFactory.IsValid)
             {
-                Task<LoopyCommand> sendTask = AppConnectionFactory.Instance.SendCommandAsync(lc).AsTask();
-                sendTask.Wait();
-                retCommand = sendTask.Result;
+                retCommand = AppConnectionFactory.Instance.SendCommandAsync(lc).GetAwaiter().GetResult();
             }
 
             var response = new GetResponse(GetResponse.ResponseStatus.OK, retCommand);
-            Debug.WriteLine("Command responding with: {0}", response);
+            _log.Information($"Command responding with: {response.ToString()}");
             return response;
         }
 
