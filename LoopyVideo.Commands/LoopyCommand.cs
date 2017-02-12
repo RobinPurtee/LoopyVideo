@@ -22,6 +22,7 @@
 //  THE SOFTWARE.
 //  ---------------------------------------------------------------------------------
 using System;
+using System.Text;
 using Windows.Foundation.Collections;
 
 namespace LoopyVideo.Commands
@@ -38,7 +39,8 @@ namespace LoopyVideo.Commands
             Error,
             Play,
             Stop,
-            Media
+            Media,
+            State
         };
 
 
@@ -47,7 +49,6 @@ namespace LoopyVideo.Commands
 
         public LoopyCommand() : this(CommandType.Unknown, ""){ }
         public LoopyCommand(CommandType c) : this(c, "") { }
-        //public LoopyCommand(LoopyCommand lc) : this(lc.Command, lc.Param) { }
         public LoopyCommand(CommandType c, string p)
         {
             Command = c;
@@ -59,6 +60,7 @@ namespace LoopyVideo.Commands
             Command = lc.Command;
             Param = lc.Param;
         }
+
         public static LoopyCommand FromValueSet(ValueSet values)
         {
             LoopyCommand lc = new LoopyCommand();
@@ -97,7 +99,13 @@ namespace LoopyVideo.Commands
 
         public override string ToString()
         {
-            return $"Command: {Command.ToString()}  Param: {Param}";
+            StringBuilder jsonStr = new StringBuilder($"{{ {commandName}: {Command.ToString()}");
+            if(!string.IsNullOrEmpty(Param))
+            {
+                jsonStr.Append($", {paramName} : {Param}");
+            }
+            jsonStr.Append(" }");
+            return jsonStr.ToString();
         }
     }
 

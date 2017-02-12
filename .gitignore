@@ -3,3 +3,4 @@ bin/
 LoopyVideo/Assets/Test2.mp4
 .vs/
 *.lock.json
+packages/

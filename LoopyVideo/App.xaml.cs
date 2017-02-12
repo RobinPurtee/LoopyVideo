@@ -104,7 +104,33 @@ namespace LoopyVideo
                     }
                     break;
                 case LoopyCommand.CommandType.Media:
+                    retCommand.Command = LoopyCommand.CommandType.Media;
+                    retCommand.Param = Player.MediaUri.ToString();
+                    break;
+                case LoopyCommand.CommandType.State:
 
+                    switch (Player.State)
+                    {
+                        case Windows.Media.Playback.MediaPlaybackState.Opening:
+                            retCommand.Command = LoopyCommand.CommandType.Unknown;
+                            retCommand.Param = "Video is currently opening";
+                            break;
+                        case Windows.Media.Playback.MediaPlaybackState.Buffering:
+                            retCommand.Command = LoopyCommand.CommandType.Unknown;
+                            retCommand.Param = "Video is buffering";
+                            break;
+                        case Windows.Media.Playback.MediaPlaybackState.Playing:
+                            retCommand.Command = LoopyCommand.CommandType.Play;
+                            break;
+                        case Windows.Media.Playback.MediaPlaybackState.Paused:
+                            retCommand.Command = LoopyCommand.CommandType.Stop;
+                            break;
+                        default:
+                            retCommand.Command = LoopyCommand.CommandType.Unknown;
+                            break;
+                    }
+
+                    break;
                 default:
                     break;
 

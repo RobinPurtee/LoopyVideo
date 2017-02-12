@@ -23,6 +23,7 @@
 //  ---------------------------------------------------------------------------------
 using System;
 using System.Text;
+using System.Diagnostics;
 using Windows.Foundation.Diagnostics;
 using Windows.Foundation.Collections;
 
@@ -31,11 +32,29 @@ namespace LoopyVideo.Logging
     public class Logger : IDisposable
     {
         private LoggingChannel _logChannel;
-        
+        private string _providerName;
+        /// <summary>
+        /// Method that actually writes the message
+        /// </summary>
+        /// <param name="message">The message to log</param>
+        /// <param name="level">The diagnostic level of the message</param>
+        /// <remarks>This method logs to bot the Debug console and the ETW for the system</remarks>
+        private void LogMessage(string message, LoggingLevel level)
+        {
+            _logChannel.LogMessage(message, LoggingLevel.Information);
+            Debug.WriteLine($"[{level.ToString()}] ({_providerName}) {message}");
+            
+        }
 
+        /// <summary>
+        /// Logger initializing constructor
+        /// </summary>
+        /// <param name="providerName">The name of the message provider</param>
         public Logger(string providerName)
         {
+            // setup a log channel to the Microsoft-Windows-Diagnostic-LoggingChannel channel
             _logChannel = new LoggingChannel(providerName, null, new Guid("4bd2826e-54a1-4ba9-bf63-92b73ea1ac4a"));
+            _providerName = providerName;
         }
 
         #region IDisposable Members
@@ -85,31 +104,51 @@ namespace LoopyVideo.Logging
 
         #endregion
 
-
+        /// <summary>
+        /// Log an informational message
+        /// </summary>
+        /// <param name="message">The message to log</param>
         public void Information(string message)
         {
-            _logChannel.LogMessage(message, LoggingLevel.Information);
+            LogMessage(message, LoggingLevel.Information);
         }
 
+        /// <summary>
+        /// Log an error message
+        /// </summary>
+        /// <param name="message">The message to log</param>
         public void Error(string message)
         {
-            _logChannel.LogMessage(message, LoggingLevel.Error);
+            LogMessage(message, LoggingLevel.Error);
         }
     }
 
+    /// <summary>
+    /// Helper class to output a ValueSet has a JSON string
+    /// </summary>
     public static class ValueSetOut
     {
+        /// <summary>
+        /// Create a JSON string from a ValueSet
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
         public static string ToString(ValueSet values)
         {
-            StringBuilder valueBuilder = new StringBuilder();
+            if(null == values)
+            {
+                return string.Empty;
+            }
+            StringBuilder valueBuilder = new StringBuilder("{ ");
             foreach (var pair in values)
             {
-                if (valueBuilder.Length > 0)
+                if (valueBuilder.Length > 2)
                 {
-                    valueBuilder.Append(" | ");
+                    valueBuilder.Append(", ");
                 }
-                valueBuilder.Append($"Key: {pair.Key} Value: {pair.Value}");
+                valueBuilder.Append($"{pair.Key} : {pair.Value} ");
             }
+            valueBuilder.Append("}");
 
             return valueBuilder.ToString();
         }

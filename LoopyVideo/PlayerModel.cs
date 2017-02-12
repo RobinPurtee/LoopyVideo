@@ -98,7 +98,7 @@ namespace LoopyVideo
         }
 
         /// <summary>
-        /// Get the default media uri
+        /// Get the default media Uri
         /// </summary>
         /// <returns></returns>
         private Uri GetDefaultMediaUri()
@@ -165,7 +165,7 @@ namespace LoopyVideo
         }
 
         /// <summary>
-        /// default contructor
+        /// default constructor
         /// </summary>
         public PlayerModel() : this(null, null) { }
 

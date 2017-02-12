@@ -61,5 +61,11 @@ namespace LoopyVideo.WebService
         {
             return SendAppCommand(LoopyCommand.CommandType.Stop);
         }
+
+        [UriFormat("/state")]
+        public IGetResponse GetPlayerStatus()
+        {
+            return SendAppCommand(LoopyCommand.CommandType.State);
+        }
     }
 }

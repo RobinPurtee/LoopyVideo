@@ -23,7 +23,7 @@
         var method = $("#method").val();
         var extraHeaders = undefined;
         if (method === "PUT")
-            extraHeaders = { 'x-my-custom-header': 'some value' }
+            extraHeaders = { 'x-my-custom-header': 'some value' };
         $.ajax({
             url: $("#url").val(),
             method: method,

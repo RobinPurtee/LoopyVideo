@@ -31,7 +31,7 @@ namespace LoopyVideo.Commands
 {
 
     /// <summary>
-    /// The connection between LoopyVideo.AppService and  the apps being serviced
+    /// The connection between LoopyVideo.AppService and  the app being serviced
     /// </summary>
     public sealed class AppConnection : IDisposable
     {
@@ -40,18 +40,20 @@ namespace LoopyVideo.Commands
         private readonly static string _serviceNameDefault = "net.manipulatormanor.LoopyWebServer";
         private readonly static string _serviceFamilyNameDefault = "LoopyVideo.WebService-uwp_n1q2psqd6svm2";
         /// <summary>
-        /// Message Recieved event handler
+        /// Message Received event handler
         /// </summary>
-        /// <param name="command">The command recieved</param>
+        /// <param name="command">The command received</param>
         /// <returns>The current status </returns>
         public delegate LoopyCommand ReceiveMessage(LoopyCommand command);
-
+        /// <summary>
+        /// Event fired when a message is received by from the app service
+        /// </summary>
         public event ReceiveMessage MessageReceived;
 
-
-        // The instance of this class
-
         private string _serviceName;
+        /// <summary>
+        /// The name of the service to connect to.
+        /// </summary>
         public string ServiceName
         {
             get
@@ -66,6 +68,9 @@ namespace LoopyVideo.Commands
         }
 
         private string _familyName;
+        /// <summary>
+        /// The name of the service family of the app to connect to.
+        /// </summary>
         public string ServiceFamilyName
         {
             get
@@ -81,42 +86,63 @@ namespace LoopyVideo.Commands
 
         private object _connectionLock = new object();    
         private AppServiceConnection _connection;
+        /// <summary>
+        /// The connections to the app service
+        /// </summary>
         public AppServiceConnection Connection
         {
-            get { return _connection; }
+            get { lock (_connectionLock) { return _connection; } }
             set
             {
                 lock (_connectionLock)
                 {
-                    if(_connection != null)
+
+                    try
                     {
-                        _connection.RequestReceived -= RequestReceived;
-                        _connection.ServiceClosed -= ServiceClosed;
-                        _connection.Dispose();
+                        _log.Information($"AppConnection.Connection.set enter: {((null != _connection) ? "has a connection" : "is disconnected")} and Status : {Status.ToString()}");
+                        if (_connection != null)
+                        {
+                            _connection.RequestReceived -= RequestReceived;
+                            _connection.ServiceClosed -= ServiceClosed;
+                            _connection.Dispose();
+                            Status = AppServiceConnectionStatus.Unknown;
+                        }
+                        _connection = value;
+                        if (_connection != null)
+                        {
+                            Status = AppServiceConnectionStatus.Success;
+                            _connection.ServiceClosed += ServiceClosed;
+                            _connection.RequestReceived += RequestReceived;
+                        }
+                        _log.Information($"AppConnection.Connection.set exit: {((null != _connection) ? "has a Connection" : "is disconnected")} and Status : {Status.ToString()}");
+
                     }
-                    _connection = value;
-                    if (_connection != null)
+                    catch (Exception ex)
                     {
-                        _connection.RequestReceived += RequestReceived;
-                        _connection.ServiceClosed += ServiceClosed;
-                        Status = AppServiceConnectionStatus.Success;
-                    }
-                }
+                        _log.Error($"Error setting Connection : {ex.Message}");
+                        throw;
+                    }                }
             }
         }
 
- 
+        /// <summary>
+        /// The connection status
+        /// </summary>
         public AppServiceConnectionStatus Status
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Test if the connection is actually connected
+        /// </summary>
+        /// <returns></returns>
         public bool IsValid()
         {
             try
             {
-                _log.Information($"AppConnection.IsValid: {((null != Connection) ? "is Connected" : "is Not connected}")} and Status : {Status.ToString()}");
+                _log.Information($"AppConnection.IsValid: {((null != Connection) ? "is Connected" : "is Not connected")} and Status : {Status.ToString()}");
                 return (null != Connection) && (Status == AppServiceConnectionStatus.Success);
             }
             catch(Exception ex)
@@ -126,21 +152,25 @@ namespace LoopyVideo.Commands
             return false;
         }
 
-
         /// <summary>
         /// Default constructor
         /// </summary>
         public AppConnection() : this("AppConnection")
         {
         }
-
+        /// <summary>
+        /// Initializing constructor
+        /// </summary>
+        /// <param name="logProviderName">The name of the log provider to use for this connection</param>
         public AppConnection(string logProviderName)
         {
             _log = new Logger(logProviderName);
             _connection = null;
             Status = AppServiceConnectionStatus.Unknown;
         }
-
+        /// <summary>
+        /// Destructor
+        /// </summary>
         ~AppConnection()
         {
             Dispose(true);
@@ -164,15 +194,20 @@ namespace LoopyVideo.Commands
                 return;
             }
 
+            _log.Information("AppConnection is Disposed");
             if (disposing)
             {
+                if(Connection != null)
+                {
+                    Connection.Dispose();
+                }
                 Connection = null;
                 if (_log != null)
                 {
                     _log.Dispose();
                 }
+                _log = null;
             }
-
             disposed = true;
         }
 
@@ -192,6 +227,10 @@ namespace LoopyVideo.Commands
 
         #endregion
 
+        /// <summary>
+        /// Open the connection to the App service
+        /// </summary>
+        /// <returns>The AppServiceConnectionStatus object giving the status of the connection</returns>
         public IAsyncOperation<AppServiceConnectionStatus> OpenConnectionAsync()
         {
             _log.Information("OpenConnectionAsync: called");
@@ -219,7 +258,7 @@ namespace LoopyVideo.Commands
         }
 
         /// <summary>
-        /// Send a Command message to the head applicaiton
+        /// Send a Command message to the head application
         /// </summary>
         /// <param name="command">The command to send</param>
         /// <returns>The LoopyCommand containing the response</returns>
@@ -263,13 +302,13 @@ namespace LoopyVideo.Commands
         /// Receive messages from the other app
         /// </summary>
         /// <param name="sender">The connection the message is from</param>
-        /// <param name="args">The argurments fo the message</param>
+        /// <param name="args">The arguments for the message</param>
         private async void RequestReceived(AppServiceConnection sender, AppServiceRequestReceivedEventArgs args)
         {
             if(!IsValid())
             {
-                _log.Information("SendCommandAsync: called before the connection is valid");
-                throw new InvalidOperationException("Message recieved before connection is opened");
+                _log.Information("AppConnection.RequestReceived: called before the connection is valid");
+                throw new InvalidOperationException("Message received before connection is opened");
             }
             var requestDefferal = args.GetDeferral();
             try
@@ -285,14 +324,18 @@ namespace LoopyVideo.Commands
                     status = await args.Request.SendResponseAsync(result.ToValueSet());
                 }
 
-                _log.Information($"Sending Response to Request returned: {status.ToString()}");
+                _log.Information($"AppConnection.RequestReceived: Response to Request returned: {status.ToString()}");
             }
             finally
             {
                 requestDefferal.Complete();
             }
         }
-
+        /// <summary>
+        /// Handler for the Service connection closed event from the AppServiceConnection
+        /// </summary>
+        /// <param name="sender">The AppConnection that is closing (i.e. this pointer)</param>
+        /// <param name="args">any arguments for the service closure (unused)</param>
         private void ServiceClosed(AppServiceConnection sender, AppServiceClosedEventArgs args)
         {
             _log.Information($"AppService Connection has be closed by: {args.Status.ToString()}");
